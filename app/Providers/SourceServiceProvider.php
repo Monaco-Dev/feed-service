@@ -8,6 +8,8 @@ use App\Helpers\Contracts\HttpRequestInterface;
 use App\Helpers\HttpRequest;
 use App\Sources\Auth\Contracts\AuthSourceInterface;
 use App\Sources\Auth\AuthSource;
+use App\Sources\Auth\Contracts\OAuthSourceInterface;
+use App\Sources\Auth\OAuthSource;
 
 class SourceServiceProvider extends ServiceProvider
 {
@@ -19,6 +21,7 @@ class SourceServiceProvider extends ServiceProvider
     public $bindings = [
         HttpRequestInterface::class => HttpRequest::class,
         AuthSourceInterface::class => AuthSource::class,
+        OAuthSourceInterface::class => OAuthSource::class,
     ];
 
     /**

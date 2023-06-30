@@ -14,6 +14,31 @@ class Post extends Model
         CascadeSoftDeletes;
 
     /**
+     * The connection name for the model.
+     * 
+     * @var string
+     */
+    protected $connection = 'mysql';
+
+    /**
+     * The relationship counts that should be eager loaded on every query.
+     * 
+     * @var array<string>
+     */
+    protected $withCount = [
+        'shares'
+    ];
+
+    /**
+     * The relations to eager load on every query.
+     * 
+     * @var array<string>
+     */
+    protected $with = [
+        'user'
+    ];
+
+    /**
      * The relationships that are soft deletable.
      * 
      * @var array<string>
@@ -48,8 +73,18 @@ class Post extends Model
      * 
      * @return App\Models\Pin
      */
-    public function pin()
+    public function pins()
     {
         return $this->hasMany(Pin::class);
+    }
+
+    /**
+     * Return User relationship.
+     * 
+     * @return App\Models\User
+     */
+    public function user()
+    {
+        return $this->belongsTo(User::class);
     }
 }

@@ -2,10 +2,15 @@
 
 namespace App\Providers;
 
+use App\Services\Contracts\PinServiceInterface;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Http\Resources\Json\JsonResource;
 
 use App\Services\Contracts\PostServiceInterface;
+use App\Services\Contracts\ShareServiceInterface;
+use App\Services\PinService;
 use App\Services\PostService;
+use App\Services\ShareService;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -15,7 +20,9 @@ class AppServiceProvider extends ServiceProvider
      * @var array
      */
     public $bindings = [
-        PostServiceInterface::class => PostService::class
+        PostServiceInterface::class => PostService::class,
+        PinServiceInterface::class => PinService::class,
+        ShareServiceInterface::class => ShareService::class
     ];
 
     /**
@@ -31,6 +38,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        JsonResource::withoutWrapping();
     }
 }

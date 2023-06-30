@@ -4,13 +4,20 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable;
+    use HasFactory, Notifiable, SoftDeletes;
+
+    /**
+     * The connection name for the model.
+     * 
+     * @var string
+     */
+    protected $connection = 'auth_mysql';
 
     /**
      * The attributes that are mass assignable.
@@ -24,16 +31,18 @@ class User extends Authenticatable
         'username',
         'email',
         'phone_number',
-        'password',
         'full_name',
+        'email_verified_at',
         'is_email_verified',
+        'phone_number_verified_at',
         'is_phone_number_verified',
         'socials',
         'broker_license',
-        'connections',
-        'pending_invitations',
-        'request_invitations',
-        'mutuals',
+        'mutuals_count',
+        'connections_count',
+        'pending_invitations_count',
+        'request_invitations_count',
+        'created_at'
     ];
 
     /**
@@ -42,7 +51,7 @@ class User extends Authenticatable
      * @var array<int, string>
      */
     protected $hidden = [
-        'password',
+        'password'
     ];
 
     /**
@@ -55,4 +64,102 @@ class User extends Authenticatable
         'phone_number_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
+
+    /**
+     * The accessors to append to the model's array form.
+     * 
+     * @var array<string>
+     */
+    protected $appends = [
+        'is_email_verified'
+    ];
+
+    /**
+     * Append new attribute.
+     * 
+     * @return bool
+     */
+    public function getIsEmailVerifiedAttribute()
+    {
+        return !!$this->email_verified_at;
+    }
+
+    /**
+     * Return User relationship.
+     * 
+     * @return App\Models\User
+     */
+    public function networkUsers()
+    {
+        return $this->belongsToMany(User::class, 'connections', 'user_id', 'connection_user_id')
+            ->whereHas('brokerLicense', function ($query) {
+                $query->whereNotNull('verified_at');
+            });
+    }
+
+    /**
+     * Return User relationship.
+     * 
+     * @return App\Models\User
+     */
+    public function connectionUsers()
+    {
+        return $this->belongsToMany(User::class, 'connections', 'connection_user_id', 'user_id')
+            ->whereHas('brokerLicense', function ($query) {
+                $query->whereNotNull('verified_at');
+            });
+    }
+
+    /**
+     * Return Connection relationship.
+     * 
+     * @return App\Models\Connection
+     */
+    public function connections()
+    {
+        return $this->hasMany(Connection::class)
+            ->whereHas('connection.brokerLicense', function ($query) {
+                $query->whereNotNull('verified_at');
+            });
+    }
+
+    /**
+     * Return BrokerLicense relationship.
+     * 
+     * @return App\Models\BrokerLicense
+     */
+    public function brokerLicense()
+    {
+        return $this->hasOne(BrokerLicense::class);
+    }
+
+    /**
+     * Return Post relationship.
+     * 
+     * @return App\Models\Post
+     */
+    public function posts()
+    {
+        return $this->hasMany(Post::class);
+    }
+
+    /**
+     * Return Share relationship.
+     * 
+     * @return App\Models\Share
+     */
+    public function shares()
+    {
+        return $this->hasMany(Share::class);
+    }
+
+    /**
+     * Return Pin relationship.
+     * 
+     * @return App\Models\Pin
+     */
+    public function pins()
+    {
+        return $this->hasMany(Pin::class);
+    }
 }

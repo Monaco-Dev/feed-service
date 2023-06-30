@@ -4,13 +4,27 @@ namespace App\Http\Requests\Post;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class SearchRequest extends FormRequest
+use Facades\App\Repositories\Contracts\PostRepositoryInterface as PostRepository;
+
+class ShowRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
     {
+        $post = PostRepository::find($this->id, false);
+
+        if (!$post) abort(404, 'Not found.');
+
+        if (
+            !$post->user->is_email_verified ||
+            !$post->user->brokerLicense ||
+            !($post->user->brokerLicense && $post->user->brokerLicense->is_license_verified)
+        ) {
+            return false;
+        }
+
         return true;
     }
 
@@ -22,10 +36,7 @@ class SearchRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'search' => [
-                'nullable',
-                'string'
-            ]
+            //
         ];
     }
 }

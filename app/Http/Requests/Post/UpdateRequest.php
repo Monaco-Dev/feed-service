@@ -3,6 +3,9 @@
 namespace App\Http\Requests\Post;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Auth;
+
+use Facades\App\Repositories\Contracts\PostRepositoryInterface as PostRepository;
 
 class UpdateRequest extends FormRequest
 {
@@ -11,6 +14,12 @@ class UpdateRequest extends FormRequest
      */
     public function authorize(): bool
     {
+        $post = PostRepository::find($this->id, false);
+
+        if (!$post) abort(404, 'Not found.');
+
+        if (Auth::user()->id !== $post->user_id) return false;
+
         return true;
     }
 
@@ -24,6 +33,7 @@ class UpdateRequest extends FormRequest
         return [
             'content' => [
                 'required',
+                'sometimes',
                 'string'
             ]
         ];

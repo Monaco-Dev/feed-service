@@ -7,7 +7,8 @@ use App\Http\Requests\Post\{
     StoreRequest,
     UpdateRequest,
     DestroyRequest,
-    SearchRequest
+    SearchRequest,
+    ShowRequest,
 };
 
 class PostController extends Controller
@@ -43,10 +44,11 @@ class PostController extends Controller
     /**
      * Display the specified resource.
      *
+     * @param  \App\Http\Requests\Post\ShowRequest $request
      * @param  int|string  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(ShowRequest $request, $id)
     {
         return $this->service->show($id);
     }

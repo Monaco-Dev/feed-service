@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Share extends Model
+class Connection extends Model
 {
     use HasFactory, SoftDeletes;
 
@@ -15,7 +15,7 @@ class Share extends Model
      * 
      * @var string
      */
-    protected $connection = 'mysql';
+    protected $connection = 'auth_mysql';
 
     /**
      * The attributes that are mass assignable.
@@ -24,18 +24,8 @@ class Share extends Model
      */
     protected $fillable = [
         'user_id',
-        'post_id'
+        'connection_user_id',
     ];
-
-    /**
-     * Return Post relationship.
-     * 
-     * @return App\Models\Post
-     */
-    public function post()
-    {
-        return $this->belongsTo(Post::class);
-    }
 
     /**
      * Return User relationship.
@@ -45,5 +35,25 @@ class Share extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    /**
+     * Return User relationship.
+     * 
+     * @return App\Models\User
+     */
+    public function connection()
+    {
+        return $this->belongsTo(User::class, 'connection_user_id', 'id');
+    }
+
+    /**
+     * Return BrokerLicense relationship.
+     * 
+     * @return App\Models\BrokerLicense
+     */
+    public function brokerLicense()
+    {
+        return $this->hasOne(BrokerLicense::class, 'user_id', 'connection_user_id');
     }
 }

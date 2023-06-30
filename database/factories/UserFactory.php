@@ -23,9 +23,19 @@ class UserFactory extends Factory
             'username' => fake()->userName(),
             'email' => fake()->unique()->safeEmail(),
             'phone_number' => fake()->phoneNumber(),
-            'email_verified_at' => now(),
-            'phone_number_verified_at' => now(),
-            'password' => 'Password123!'
+            'full_name' => fake()->name(),
+            'is_email_verified' => true,
+            'is_phone_verified' => true,
+            'socials' => [],
+            'broker_license' => (object) [
+                'id' => fake()->unique()->randomDigit(),
+                'is_license_verified' => true,
+                'license_number' => fake()->numerify('#######')
+            ],
+            'mutuals_count' => fake()->randomDigitNotZero(),
+            'connections_count' => fake()->randomDigitNotZero(),
+            'pending_invitations_count' => fake()->randomDigitNotZero(),
+            'request_invitations_count' => fake()->randomDigitNotZero()
         ];
     }
 
