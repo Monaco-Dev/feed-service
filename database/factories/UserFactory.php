@@ -30,6 +30,7 @@ class UserFactory extends Factory
             'broker_license' => (object) [
                 'id' => fake()->unique()->randomDigit(),
                 'is_license_verified' => true,
+                'is_license_expired' => false,
                 'license_number' => fake()->numerify('#######')
             ],
             'mutuals_count' => fake()->randomDigitNotZero(),

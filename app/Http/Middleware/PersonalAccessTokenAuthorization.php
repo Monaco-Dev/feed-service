@@ -52,6 +52,10 @@ class PersonalAccessTokenAuthorization
             abort(403, 'Your license number is not verified.');
         }
 
+        if (!optional($user->broker_license)->is_license_expired) {
+            abort(403, 'Your license number is expired.');
+        }
+
         // login the user via auth
         auth()->login($user);
 

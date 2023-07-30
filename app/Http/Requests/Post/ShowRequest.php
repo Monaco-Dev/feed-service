@@ -15,12 +15,15 @@ class ShowRequest extends FormRequest
     {
         $post = PostRepository::find($this->id, false);
 
-        if (!$post) abort(404, 'Not found.');
+        if (!$post || !($post && $post->user)) abort(404, 'Not found.');
 
         if (
             !$post->user->is_email_verified ||
             !$post->user->brokerLicense ||
-            !($post->user->brokerLicense && $post->user->brokerLicense->is_license_verified)
+            ($post->user->brokerLicense &&
+                !$post->user->brokerLicense->is_license_verified &&
+                $post->user->brokerLicense->is_license_expired
+            )
         ) {
             return false;
         }

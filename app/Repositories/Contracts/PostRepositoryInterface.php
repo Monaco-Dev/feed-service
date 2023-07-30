@@ -12,6 +12,32 @@ use App\Repositories\Support\BaseContracts\{
 interface PostRepositoryInterface extends Create, Find, Update, Delete
 {
     /**
-     * Here you insert custom functions.
+     * Get paginated pin posts
+     * 
+     * @return \Illuminate\Database\Eloquent\Model
      */
+    public function pins();
+
+    /**
+     * Get paginated shared posts
+     * 
+     * @return \Illuminate\Database\Eloquent\Model
+     */
+    public function shares();
+
+    /**
+     * Display the specified resource.
+     *
+     * @param int|string $id
+     * @return \Illuminate\Database\Eloquent\Model
+     */
+    public function show($id);
+
+    /**
+     * Search for specific resources in the database.
+     * 
+     * @param array $request
+     * @return \Illuminate\Http\Response
+     */
+    public function search(array $request);
 }

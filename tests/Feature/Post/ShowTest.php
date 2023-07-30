@@ -21,7 +21,7 @@ class ShowTest extends TestCase
     {
         $this->WithoutMiddleware();
 
-        $user = User::factory()->make();
+        $user = User::first();
         $post = Post::factory()->create(['user_id' => $user->id]);
 
         $this->actingAs($user)
