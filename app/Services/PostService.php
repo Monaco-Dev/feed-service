@@ -42,6 +42,19 @@ class PostService extends Service implements PostServiceInterface
     }
 
     /**
+     * Store a newly created resource in storage.
+     *
+     * @param array $request
+     * @return \Illuminate\Database\Eloquent\Model
+     */
+    public function store(array $request)
+    {
+        $post = $this->repository->create($request);
+
+        return new PostResource($post);
+    }
+
+    /**
      * Display the specified resource.
      *
      * @param int|string $id
