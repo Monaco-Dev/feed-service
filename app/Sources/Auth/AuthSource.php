@@ -6,6 +6,7 @@ use Illuminate\Support\Arr;
 
 use App\Sources\Source;
 use App\Sources\Auth\Contracts\AuthSourceInterface;
+use Facades\App\Sources\Auth\Contracts\OAuthSourceInterface as OAuthSource;
 use Facades\App\Helpers\Contracts\HttpRequestInterface as HttpRequest;
 
 class AuthSource extends Source implements AuthSourceInterface
@@ -16,7 +17,8 @@ class AuthSource extends Source implements AuthSourceInterface
      */
     public function __construct()
     {
-        $this->route = sprintf('%s/api/auth', config('services.auth'));
+        $this->route = sprintf('%s/api/service', config('services.auth'));
+        $this->token = OAuthSource::getClientToken();
     }
 
     /**
@@ -29,9 +31,13 @@ class AuthSource extends Source implements AuthSourceInterface
     {
         $route = sprintf('%s/verify-token', $this->route);
 
-        Arr::set($headers, 'Accept', 'application/json');
-        Arr::set($headers, 'Authorization', sprintf('Bearer %s', $token));
+        $payload = [
+            'bearerToken' => $token
+        ];
 
-        return HttpRequest::get($route, [], $headers);
+        Arr::set($headers, 'Accept', 'application/json');
+        Arr::set($headers, 'Authorization', sprintf('Bearer %s', optional($this->token)->access_token));
+
+        return HttpRequest::post($route, $payload, $headers);
     }
 }

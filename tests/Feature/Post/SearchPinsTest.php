@@ -7,14 +7,13 @@ use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 
 use App\Http\Middleware\PersonalAccessTokenAuthorization;
-use App\Models\Post;
 use App\Models\User;
 
-class StoreTest extends TestCase
+class SearchPinsTest extends TestCase
 {
     use RefreshDatabase;
 
-    protected $route = 'posts.store';
+    protected $route = 'posts.search.pins';
 
     /**
      * Test successful response.
@@ -24,11 +23,10 @@ class StoreTest extends TestCase
         $this->withoutMiddleware([PersonalAccessTokenAuthorization::class]);
 
         $user = User::factory()->create();
-        $post = Post::factory()->make();
 
         $this->actingAs($user)
             ->withHeaders(['Accept' => 'application/json'])
-            ->post(route($this->route), $post->toArray())
-            ->assertCreated();
+            ->post(route($this->route))
+            ->assertOk();
     }
 }

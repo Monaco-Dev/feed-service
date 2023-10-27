@@ -7,8 +7,8 @@ interface DeleteInterface
     /**
      * Remove the specified resource from storage.
      *
-     * @param int|string $id
-     * @return int
+     * @param mixed $model
+     * @return mixed
      */
-    public function delete($id);
+    public function delete(mixed $model);
 }

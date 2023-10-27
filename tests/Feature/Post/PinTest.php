@@ -7,14 +7,13 @@ use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 
 use App\Http\Middleware\PersonalAccessTokenAuthorization;
-use App\Models\Post;
 use App\Models\User;
 
-class UpdateTest extends TestCase
+class PinTest extends TestCase
 {
     use RefreshDatabase;
 
-    protected $route = 'posts.update';
+    protected $route = 'posts.pin';
 
     /**
      * Test not found response.
@@ -22,7 +21,7 @@ class UpdateTest extends TestCase
     public function test_not_found(): void
     {
         $this->withHeaders(['Accept' => 'application/json'])
-            ->put(route($this->route, 1))
+            ->post(route($this->route, 1))
             ->assertNotFound();
     }
 
@@ -33,11 +32,12 @@ class UpdateTest extends TestCase
     {
         $this->withoutMiddleware([PersonalAccessTokenAuthorization::class]);
 
-        $user = User::factory()->hasPosts()->create();
+        $user = User::factory()->create();
+        $dummy = User::factory()->hasBrokerLicense()->hasPosts()->create();
 
         $this->actingAs($user)
             ->withHeaders(['Accept' => 'application/json'])
-            ->put(route($this->route, $user->posts()->first()))
+            ->post(route($this->route, $dummy->posts()->first()))
             ->assertOk();
     }
 
@@ -49,11 +49,11 @@ class UpdateTest extends TestCase
         $this->withoutMiddleware([PersonalAccessTokenAuthorization::class]);
 
         $user = User::factory()->create();
-        $post = Post::factory()->create();
+        $dummy = User::factory()->unverified()->hasPosts()->create();
 
         $this->actingAs($user)
             ->withHeaders(['Accept' => 'application/json'])
-            ->put(route($this->route, $post))
+            ->post(route($this->route, $dummy->posts()->first()))
             ->assertForbidden();
     }
 }

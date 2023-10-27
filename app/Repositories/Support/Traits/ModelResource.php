@@ -28,59 +28,55 @@ trait ModelResource
     /**
      * Display the specified resource.
      *
-     * @param int|string $id
+     * @param mixed $model
      * @param bool $findOrFail
      * @return \Illuminate\Database\Eloquent\Model
      */
-    public function find($id, bool $findOrFail = true)
+    public function find(mixed $model, bool $findOrFail = true)
     {
-        return $findOrFail ? $this->model->findOrFail($id) : $this->model->find($id);
+        if (optional($model)->id) return $model;
+
+        return $findOrFail ? $this->model->findOrFail($model) : $this->model->find($model);
     }
 
     /**
      * Update the specified resource in storage.
      *
-     * @param int|string $id
+     * @param mixed $model
      * @param array $request
-     * @return \Illuminate\Database\Eloquent\Model
+     * @return mixed
      */
-    public function update($id, array $request)
+    public function update(mixed $model, array $request)
     {
-        $model = $this->model->findOrFail($id);
+        $model = optional($model)->id ? $model : $this->model->findOrFail($model);
 
-        $model->update($request);
-
-        return $model;
+        return $model->update($request);
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param int|string $id
-     * @return int
+     * @param mixed $model
+     * @return mixed
      */
-    public function delete($id)
+    public function delete(mixed $model)
     {
-        $model = $this->model->findOrFail($id);
+        $model = optional($model)->id ? $model : $this->model->findOrFail($model);
 
-        $model->delete();
-
-        return 1;
+        return $model->delete();
     }
 
     /**
      * Force remove the specified resource from storage.
      *
      * @param int|string $id
-     * @return int
+     * @return mixed
      */
     public function forceDelete($id)
     {
         $model = $this->model->findOrFail($id);
 
-        $model->forceDelete();
-
-        return 1;
+        return $model->forceDelete();
     }
 
     /**

@@ -3,7 +3,6 @@
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\{
-    PinController,
     PostController,
     ShareController
 };
@@ -20,18 +19,21 @@ use App\Http\Controllers\{
 */
 
 Route::middleware('auth.user')->group(function () {
-    Route::prefix('posts')->group(function () {
-        Route::post('/', [PostController::class, 'store'])->name('posts.store');
-        Route::get('{id}', [PostController::class, 'show'])->name('posts.show');
-        Route::put('{id}', [PostController::class, 'update'])->name('posts.update');
-        Route::delete('{id}', [PostController::class, 'destroy'])->name('posts.destroy');
-        Route::post('search', [PostController::class, 'search'])->name('posts.search');
-    });
+    Route::prefix('posts')->name('posts.')->group(function () {
+        Route::post('/', [PostController::class, 'store'])->name('store');
 
-    Route::prefix('pins')->group(function () {
-        Route::post('/', [PinController::class, 'store'])->name('pins.store');
-        Route::get('/', [PinController::class, 'index'])->name('pins.index');
-        Route::delete('{id}', [PinController::class, 'destroy'])->name('pins.destroy');
+        Route::prefix('{post}')->group(function () {
+            Route::get('/', [PostController::class, 'show'])->name('show');
+            Route::put('/', [PostController::class, 'update'])->name('update');
+            Route::delete('/', [PostController::class, 'destroy'])->name('destroy');
+            Route::post('pin', [PostController::class, 'pin'])->name('pin');
+            Route::post('unpin', [PostController::class, 'unpin'])->name('unpin');
+        });
+
+        Route::prefix('search')->name('search.')->group(function () {
+            Route::post('/', [PostController::class, 'searchPosts'])->name('posts');
+            Route::post('pins', [PostController::class, 'searchPins'])->name('pins');
+        });
     });
 
     Route::prefix('shares')->group(function () {

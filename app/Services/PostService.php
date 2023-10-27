@@ -3,11 +3,12 @@
 namespace App\Services;
 
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Arr;
 
 use App\Http\Resources\PostResource;
+use App\Models\Post;
 use App\Services\Contracts\PostServiceInterface;
 use App\Repositories\Contracts\{
-    PinRepositoryInterface,
     PostRepositoryInterface,
     ShareRepositoryInterface
 };
@@ -15,30 +16,29 @@ use App\Repositories\Contracts\{
 class PostService extends Service implements PostServiceInterface
 {
     /**
+     * Resource class of the service.
+     * 
+     * @var \App\Http\Resources\PostResource
+     */
+    protected $resourceClass = PostResource::class;
+
+    /**
      * @var \App\Repositories\Contracts\ShareRepositoryInterface
      */
     protected $shareRepository;
-
-    /**
-     * @var \App\Repositories\Contracts\PinRepositoryInterface
-     */
-    protected $pinRepository;
 
     /**
      * Create the service instance and inject its repository.
      *
      * @param App\Repositories\Contracts\PostRepositoryInterface
      * @param App\Repositories\Contracts\ShareRepositoryInterface
-     * @param App\Repositories\Contracts\PinRepositoryInterface
      */
     public function __construct(
         PostRepositoryInterface $repository,
-        ShareRepositoryInterface $shareRepository,
-        PinRepositoryInterface $pinRepository
+        ShareRepositoryInterface $shareRepository
     ) {
         $this->repository = $repository;
         $this->shareRepository = $shareRepository;
-        $this->pinRepository = $pinRepository;
     }
 
     /**
@@ -49,37 +49,11 @@ class PostService extends Service implements PostServiceInterface
      */
     public function store(array $request)
     {
-        $post = $this->repository->create($request);
+        Arr::set($request, 'user_id', optional(request()->user())->id);
 
-        return new PostResource($post);
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param int|string $id
-     * @param bool $findOrFail
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id, bool $findOrFail = true)
-    {
-        $post = $this->repository->show($id);
-
-        return new PostResource($post);
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param int|string $id
-     * @param array $request
-     * @return \Illuminate\Http\Response
-     */
-    public function update($id, array $request)
-    {
-        $this->repository->update($id, $request);
-
-        return $this->show($id);
+        return new PostResource(
+            $this->repository->create($request)
+        );
     }
 
     /**
@@ -88,10 +62,57 @@ class PostService extends Service implements PostServiceInterface
      * @param array $request
      * @return \Illuminate\Http\Response
      */
-    public function search(array $request)
+    public function searchPosts(array $request)
     {
-        $data = $this->repository->search($request);
+        $search = Arr::get($request, 'search');
 
-        return PostResource::collection($data);
+        return $this->setResponseCollection(
+            $this->repository
+                ->model()
+                ->search($search)
+                ->paginate()
+        );
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param  \App\Models\Post $post
+     * @return \Illuminate\Http\Response
+     */
+    public function pin(Post $post)
+    {
+        return request()->user()->pins()->attach($post);
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  \App\Models\Post  $post
+     * @return \Illuminate\Http\Response
+     */
+    public function unpin(Post $post)
+    {
+        return request()->user()->pins()->detach($post);
+    }
+
+    /**
+     * Search for specific resources in the database.
+     *
+     * @param  array  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function searchPins(array $request)
+    {
+        $search = Arr::get($request, 'search');
+
+        return $this->setResponseCollection(
+            request()
+                ->user()
+                ->pins()
+                ->where('content', 'LIKE', "%$search%")
+                ->orderBy('pins.created_at', 'desc')
+                ->paginate()
+        );
     }
 }

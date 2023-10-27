@@ -7,9 +7,9 @@ interface FindInterface
     /**
      * Display the specified resource.
      *
-     * @param int|string $id
+     * @param mixed $model
      * @param bool $findOrFail
      * @return \Illuminate\Database\Eloquent\Model
      */
-    public function find($id, bool $findOrFail = true);
+    public function find(mixed $model, bool $findOrFail = true);
 }

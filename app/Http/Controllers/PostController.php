@@ -7,9 +7,13 @@ use App\Http\Requests\Post\{
     StoreRequest,
     UpdateRequest,
     DestroyRequest,
-    SearchRequest,
+    SearchPostsRequest,
     ShowRequest,
+    PinRequest,
+    UnpinRequest,
+    SearchPinsRequest,
 };
+use App\Models\Post;
 
 class PostController extends Controller
 {
@@ -45,46 +49,81 @@ class PostController extends Controller
      * Display the specified resource.
      *
      * @param  \App\Http\Requests\Post\ShowRequest $request
-     * @param  int|string  $id
+     * @param  \App\Models\Post  $post
      * @return \Illuminate\Http\Response
      */
-    public function show(ShowRequest $request, $id)
+    public function show(ShowRequest $request, Post $post)
     {
-        return $this->service->show($id);
+        return $this->service->show($post);
     }
 
     /**
      * Update the specified resource in storage.
      *
      * @param  \App\Http\Requests\Post\UpdateRequest  $request
-     * @param  int|string  $id
+     * @param  \App\Models\Post  $post
      * @return \Illuminate\Http\Response
      */
-    public function update(UpdateRequest $request, $id)
+    public function update(UpdateRequest $request, Post $post)
     {
-        return $this->service->update($id, $request->validated());
+        return $this->service->update($post, $request->validated());
     }
 
     /**
      * Remove the specified resource from storage.
      *
      * @param  \App\Http\Requests\Post\DestroyRequest  $request
-     * @param  int|string $id
+     * @param  \App\Models\Post  $post
      * @return \Illuminate\Http\Response
      */
-    public function destroy(DestroyRequest $request, $id)
+    public function destroy(DestroyRequest $request, Post $post)
     {
-        return $this->service->destroy($id);
+        return $this->service->destroy($post);
     }
 
     /**
      * Search for specific resources in the database.
      *
-     * @param  \App\Http\Requests\Post\SearchRequest  $request
+     * @param  \App\Http\Requests\Post\SearchPostsRequest  $request
      * @return \Illuminate\Http\Response
      */
-    public function search(SearchRequest $request)
+    public function searchPosts(SearchPostsRequest $request)
     {
-        return $this->service->search($request->validated());
+        return $this->service->searchPosts($request->validated());
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param  \App\Http\Requests\Post\PinRequest  $request
+     * @param  \App\Models\Post $post
+     * @return \Illuminate\Http\Response
+     */
+    public function pin(PinRequest $request, Post $post)
+    {
+        return $this->service->pin($post);
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  \App\Http\Requests\Post\UnpinRequest  $request
+     * @param  \App\Models\Post  $post
+     * @return \Illuminate\Http\Response
+     */
+    public function unpin(UnpinRequest $request, Post $post)
+    {
+        return $this->service->unpin($post);
+    }
+
+    /**
+     * Search for specific resources in the database.
+     *
+     * @param  \App\Http\Requests\Post\SearchPinsRequest  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function searchPins(SearchPinsRequest $request)
+    {
+        return $this->service->searchPins($request->validated());
     }
 }

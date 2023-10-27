@@ -17,37 +17,18 @@ class PostResource extends JsonResource
     {
         $data = parent::toArray($request);
 
-        $user = Arr::get($data, 'user');
-        $shares = Arr::get($data, 'shares');
+        $data = Arr::only($data, [
+            'id',
+            'user_id',
+            'content',
+            'created_at',
+            'updated_at',
+            'pinned_at',
+            'shares_count'
+        ]);
 
-        $shares = collect($shares)->map(function ($share) {
-            return [
-                'id' => Arr::get($share, 'id'),
-                'first_name' => Arr::get($share, 'first_name'),
-                'last_name' => Arr::get($share, 'last_name'),
-                'username' => Arr::get($share, 'username'),
-                'email' => Arr::get($share, 'email'),
-                'phone_number' => Arr::get($share, 'phone_number'),
-                'full_name' => Arr::get($share, 'first_name') . ' ' . Arr::get($share, 'last_name'),
-            ];
-        })->toArray();
+        Arr::set($data, 'user', new UserResource($this->whenLoaded('user')));
 
-        return [
-            'id' => Arr::get($data, 'id'),
-            'user_id' => Arr::get($data, 'user_id'),
-            'content' => Arr::get($data, 'content'),
-            'shares_count' => Arr::get($data, 'shares_count') ?? 0,
-            'pinned_at' => Arr::get($data, 'pinned_at'),
-            'author' => [
-                'id' => Arr::get($user, 'id'),
-                'first_name' => Arr::get($user, 'first_name'),
-                'last_name' => Arr::get($user, 'last_name'),
-                'username' => Arr::get($user, 'username'),
-                'email' => Arr::get($user, 'email'),
-                'phone_number' => Arr::get($user, 'phone_number'),
-                'full_name' => Arr::get($user, 'first_name') . ' ' . Arr::get($user, 'last_name'),
-            ],
-            'shares' => $shares
-        ];
+        return $data;
     }
 }

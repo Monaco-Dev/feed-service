@@ -2,32 +2,43 @@
 
 namespace Tests\Feature\Post;
 
-use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 
+use App\Http\Middleware\PersonalAccessTokenAuthorization;
 use App\Models\Post;
 use App\Models\User;
 
 class DestroyTest extends TestCase
 {
-    use DatabaseTransactions;
+    use RefreshDatabase;
+
+    protected $route = 'posts.destroy';
+
+    /**
+     * Test not found response.
+     */
+    public function test_not_found(): void
+    {
+        $this->withHeaders(['Accept' => 'application/json'])
+            ->delete(route($this->route, 1))
+            ->assertNotFound();
+    }
 
     /**
      * Test successful response.
      */
     public function test_success(): void
     {
-        $this->WithoutMiddleware();
+        $this->withoutMiddleware([PersonalAccessTokenAuthorization::class]);
 
-        $user = User::factory()->make();
-        $post = Post::factory()->create(['user_id' => $user->id]);
+        $user = User::factory()->hasPosts()->create();
 
         $this->actingAs($user)
             ->withHeaders(['Accept' => 'application/json'])
-            ->delete(route('posts.destroy', $post->id))
-            ->assertStatus(200);
+            ->delete(route($this->route, $user->posts()->first()))
+            ->assertOk();
     }
 
     /**
@@ -35,38 +46,14 @@ class DestroyTest extends TestCase
      */
     public function test_unauthorized(): void
     {
-        $this->WithoutMiddleware();
+        $this->withoutMiddleware([PersonalAccessTokenAuthorization::class]);
 
-        $user = User::factory()->make();
-        $post = Post::factory()->create(['user_id' => $user->id + 1]);
+        $user = User::factory()->create();
+        $post = Post::factory()->create();
 
         $this->actingAs($user)
             ->withHeaders(['Accept' => 'application/json'])
-            ->delete(route('posts.destroy', $post->id))
-            ->assertStatus(403);
-    }
-
-    /**
-     * Test not found response.
-     */
-    public function test_not_found(): void
-    {
-        $this->WithoutMiddleware();
-
-        $this->withHeaders(['Accept' => 'application/json'])
-            ->delete(route('posts.destroy', 0))
-            ->assertStatus(404);
-    }
-
-    /**
-     * Test unauthenticated response.
-     */
-    public function test_unauthenticated(): void
-    {
-        $post = Post::factory()->create();
-
-        $this->withHeaders(['Accept' => 'application/json'])
-            ->delete(route('posts.destroy', $post->id))
-            ->assertStatus(401);
+            ->delete(route($this->route, $post))
+            ->assertForbidden();
     }
 }

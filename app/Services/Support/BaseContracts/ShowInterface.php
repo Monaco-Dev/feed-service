@@ -7,9 +7,9 @@ interface ShowInterface
     /**
      * Display the specified resource.
      *
-     * @param int|string $id
+     * @param mixed $model
      * @param bool $findOrFail
      * @return \Illuminate\Database\Eloquent\Model
      */
-    public function show($id, bool $findOrFail = true);
+    public function show(mixed $model, bool $findOrFail = true);
 }

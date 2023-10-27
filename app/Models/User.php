@@ -2,15 +2,14 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 
 class User extends Authenticatable
 {
-    use HasFactory, Notifiable, SoftDeletes;
+    use HasFactory, Notifiable;
 
     /**
      * The connection name for the model.
@@ -18,32 +17,6 @@ class User extends Authenticatable
      * @var string
      */
     protected $connection = 'auth_mysql';
-
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
-    protected $fillable = [
-        'id',
-        'first_name',
-        'last_name',
-        'username',
-        'email',
-        'phone_number',
-        'full_name',
-        'email_verified_at',
-        'is_email_verified',
-        'phone_number_verified_at',
-        'is_phone_number_verified',
-        'socials',
-        'broker_license',
-        'mutuals_count',
-        'connections_count',
-        'pending_invitations_count',
-        'request_invitations_count',
-        'created_at'
-    ];
 
     /**
      * The attributes that should be hidden for serialization.
@@ -61,8 +34,8 @@ class User extends Authenticatable
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
-        'phone_number_verified_at' => 'datetime',
         'password' => 'hashed',
+        'deactivated_at' => 'datetime'
     ];
 
     /**
@@ -71,7 +44,15 @@ class User extends Authenticatable
      * @var array<string>
      */
     protected $appends = [
-        'is_email_verified'
+        'is_email_verified',
+        'is_deactivated',
+        'full_name',
+        'url',
+        'is_incoming_invite',
+        'is_outgoing_invite',
+        'is_following',
+        'is_follower',
+        'is_connection',
     ];
 
     /**
@@ -85,42 +66,127 @@ class User extends Authenticatable
     }
 
     /**
-     * Return User relationship.
+     * Append new attribute.
      * 
-     * @return App\Models\User
+     * @return bool
      */
-    public function networkUsers()
+    public function getIsDeactivatedAttribute()
     {
-        return $this->belongsToMany(User::class, 'connections', 'user_id', 'connection_user_id')
-            ->whereHas('brokerLicense', function ($query) {
-                $query->whereNotNull('verified_at');
-            });
+        return !!$this->deactivated_at;
     }
 
     /**
-     * Return User relationship.
+     * Append new attribute.
      * 
-     * @return App\Models\User
+     * @return bool
      */
-    public function connectionUsers()
+    public function getFullNameAttribute()
     {
-        return $this->belongsToMany(User::class, 'connections', 'connection_user_id', 'user_id')
-            ->whereHas('brokerLicense', function ($query) {
-                $query->whereNotNull('verified_at');
-            });
+        return $this->first_name . ' ' . $this->last_name;
     }
 
     /**
-     * Return Connection relationship.
+     * Append new attribute.
      * 
-     * @return App\Models\Connection
+     * @return bool
      */
-    public function connections()
+    public function getIsOutgoingInviteAttribute()
     {
-        return $this->hasMany(Connection::class)
-            ->whereHas('connection.brokerLicense', function ($query) {
-                $query->whereNotNull('verified_at');
-            });
+        if (!optional(request()->user())->id) return false;
+
+        return $this->incomingInvites()
+            ->wherePivot(
+                'user_id',
+                request()->user()->id
+            )->exists();
+    }
+
+    /**
+     * Append new attribute.
+     * 
+     * @return bool
+     */
+    public function getIsIncomingInviteAttribute()
+    {
+        if (!optional(request()->user())->id) return false;
+
+        return $this->outgoingInvites()
+            ->wherePivot(
+                'connection_invitation_user_id',
+                request()->user()->id
+            )->exists();
+    }
+
+    /**
+     * Append new attribute.
+     * 
+     * @return bool
+     */
+    public function getIsFollowingAttribute()
+    {
+        if (!optional(request()->user())->id) return false;
+
+        return $this->followers()
+            ->wherePivot(
+                'user_id',
+                request()->user()->id
+            )->exists();
+    }
+
+    /**
+     * Append new attribute.
+     * 
+     * @return bool
+     */
+    public function getIsFollowerAttribute()
+    {
+        if (!optional(request()->user())->id) return false;
+
+        return $this->following()
+            ->wherePivot(
+                'follow_user_id',
+                request()->user()->id
+            )->exists();
+    }
+
+    /**
+     * Append new attribute.
+     * 
+     * @return bool
+     */
+    public function getIsConnectionAttribute()
+    {
+        if (!optional(request()->user())->id) return false;
+
+        return $this->connections()
+            ->wherePivot(
+                'connection_user_id',
+                request()->user()->id
+            )->exists();
+    }
+
+    /**
+     * Append new attribute.
+     * 
+     * @return bool
+     */
+    public function getUrlAttribute()
+    {
+        $domain = config('services.web_url');
+        $slug = optional(optional($this->slugs())->primary())->slug;
+
+        return $slug ? url("$domain/$slug") : null;
+    }
+
+    /**
+     * Hash password attribute.
+     * 
+     * @param string $value
+     * @return mixed
+     */
+    public function setPasswordAttribute($value)
+    {
+        $this->attributes['password'] = password_hash($value, PASSWORD_ARGON2I);
     }
 
     /**
@@ -130,7 +196,17 @@ class User extends Authenticatable
      */
     public function brokerLicense()
     {
-        return $this->hasOne(BrokerLicense::class);
+        return $this->setConnection('auth_mysql')->hasOne(BrokerLicense::class);
+    }
+
+    /**
+     * Return Slug relationship.
+     * 
+     * @return App\Models\Slug
+     */
+    public function slugs()
+    {
+        return $this->setConnection('auth_mysql')->hasMany(Slug::class);
     }
 
     /**
@@ -140,7 +216,7 @@ class User extends Authenticatable
      */
     public function posts()
     {
-        return $this->hasMany(Post::class);
+        return $this->setConnection('mysql')->hasMany(Post::class);
     }
 
     /**
@@ -150,7 +226,7 @@ class User extends Authenticatable
      */
     public function shares()
     {
-        return $this->hasMany(Share::class);
+        return $this->setConnection('mysql')->hasMany(Share::class);
     }
 
     /**
@@ -160,6 +236,111 @@ class User extends Authenticatable
      */
     public function pins()
     {
-        return $this->hasMany(Pin::class);
+        return $this->setConnection('mysql')
+            ->belongsToMany(Post::class, 'pins')
+            ->withTimestamps();
+    }
+
+    /**
+     * Return Connections relationship.
+     * 
+     * @return App\Models\Connection
+     */
+    public function connections()
+    {
+        return $this->setConnection('auth_mysql')
+            ->belongsToMany(
+                User::class,
+                'connections',
+                'user_id',
+                'connection_user_id'
+            )
+            ->withTimestamps();
+    }
+
+    /**
+     * Return Connection Invitations relationship.
+     * 
+     * @return App\Models\ConnectionInvitation
+     */
+    public function outgoingInvites()
+    {
+        return $this->setConnection('auth_mysql')
+            ->belongsToMany(
+                User::class,
+                'connection_invitations',
+                'user_id',
+                'connection_invitation_user_id'
+            )
+            ->withTimestamps();
+    }
+
+    /**
+     * Return Connection Invitations relationship.
+     * 
+     * @return App\Models\ConnectionInvitation
+     */
+    public function incomingInvites()
+    {
+        return $this->setConnection('auth_mysql')
+            ->belongsToMany(
+                User::class,
+                'connection_invitations',
+                'connection_invitation_user_id',
+                'user_id'
+            )
+            ->withTimestamps();
+    }
+
+    /**
+     * Return Follow relationship.
+     * 
+     * @return App\Models\Follow
+     */
+    public function following()
+    {
+        return $this->setConnection('auth_mysql')
+            ->belongsToMany(
+                User::class,
+                'follows',
+                'user_id',
+                'follow_user_id',
+            )
+            ->withTimestamps();
+    }
+
+    /**
+     * Return Follow relationship.
+     * 
+     * @return App\Models\Follow
+     */
+    public function followers()
+    {
+        return $this->setConnection('auth_mysql')
+            ->belongsToMany(
+                User::class,
+                'follows',
+                'follow_user_id',
+                'user_id',
+            )
+            ->withTimestamps();
+    }
+
+    /**
+     * User must be verified.
+     * 
+     * @return Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeVerified(Builder $query): Builder
+    {
+        $brokerLicenseModel = (new BrokerLicense)->getConnectionName();
+        $authDb = config("database.connections.$brokerLicenseModel.database");
+
+        return $query->whereNotNull('email_verified_at')
+            ->whereNull('deactivated_at')
+            ->whereNull('deleted_at')
+            ->whereHas('brokerLicense', function ($query) use ($authDb) {
+                $query->from("$authDb.broker_licenses")->verified();
+            });
     }
 }

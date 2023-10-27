@@ -2,53 +2,57 @@
 
 namespace Tests\Feature\Post;
 
-use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 
-use App\Models\Post;
+use App\Http\Middleware\PersonalAccessTokenAuthorization;
 use App\Models\User;
 
 class ShowTest extends TestCase
 {
-    use DatabaseTransactions;
+    use RefreshDatabase;
 
-    /**
-     * Test successful response.
-     */
-    public function test_success(): void
-    {
-        $this->WithoutMiddleware();
-
-        $user = User::first();
-        $post = Post::factory()->create(['user_id' => $user->id]);
-
-        $this->actingAs($user)
-            ->withHeaders(['Accept' => 'application/json'])
-            ->get(route('posts.show', $post->id))
-            ->assertStatus(200);
-    }
-
-    /**
-     * Test unauthenticated response.
-     */
-    public function test_unauthenticated(): void
-    {
-        $this->withHeaders(['Accept' => 'application/json'])
-            ->get(route('posts.show', 0))
-            ->assertStatus(401);
-    }
+    protected $route = 'posts.show';
 
     /**
      * Test not found response.
      */
     public function test_not_found(): void
     {
-        $this->WithoutMiddleware();
-
         $this->withHeaders(['Accept' => 'application/json'])
-            ->get(route('posts.show', 0))
-            ->assertStatus(404);
+            ->get(route($this->route, 1))
+            ->assertNotFound();
+    }
+
+    /**
+     * Test successful response.
+     */
+    public function test_success(): void
+    {
+        $this->withoutMiddleware([PersonalAccessTokenAuthorization::class]);
+
+        $user = User::factory()->hasBrokerLicense()->hasPosts()->create();
+
+        $this->actingAs($user)
+            ->withHeaders(['Accept' => 'application/json'])
+            ->get(route($this->route, $user->posts()->first()))
+            ->assertOk();
+    }
+
+    /**
+     * Test unauthorized response.
+     */
+    public function test_unauthorized(): void
+    {
+        $this->withoutMiddleware([PersonalAccessTokenAuthorization::class]);
+
+        $user = User::factory()->create();
+        $dummy = User::factory()->unverified()->hasPosts()->create();
+
+        $this->actingAs($user)
+            ->withHeaders(['Accept' => 'application/json'])
+            ->get(route($this->route, $dummy->posts()->first()))
+            ->assertForbidden();
     }
 }

@@ -17,26 +17,12 @@ class UserFactory extends Factory
     public function definition(): array
     {
         return [
-            'id' => fake()->unique()->randomDigit(),
             'first_name' => fake()->firstName(),
             'last_name' => fake()->lastName(),
-            'username' => fake()->userName(),
             'email' => fake()->unique()->safeEmail(),
-            'phone_number' => fake()->phoneNumber(),
-            'full_name' => fake()->name(),
-            'is_email_verified' => true,
-            'is_phone_verified' => true,
-            'socials' => [],
-            'broker_license' => (object) [
-                'id' => fake()->unique()->randomDigit(),
-                'is_license_verified' => true,
-                'is_license_expired' => false,
-                'license_number' => fake()->numerify('#######')
-            ],
-            'mutuals_count' => fake()->randomDigitNotZero(),
-            'connections_count' => fake()->randomDigitNotZero(),
-            'pending_invitations_count' => fake()->randomDigitNotZero(),
-            'request_invitations_count' => fake()->randomDigitNotZero()
+            'phone_number' => fake()->numerify('###########'),
+            'email_verified_at' => now(),
+            'password' => 'Password123!'
         ];
     }
 
@@ -46,8 +32,7 @@ class UserFactory extends Factory
     public function unverified(): static
     {
         return $this->state(fn (array $attributes) => [
-            'email_verified_at' => null,
-            'phone_number_verified_at' => null,
+            'email_verified_at' => null
         ]);
     }
 }

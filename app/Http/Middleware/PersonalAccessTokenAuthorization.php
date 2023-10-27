@@ -42,24 +42,12 @@ class PersonalAccessTokenAuthorization
 
         $response = $this->authSource->verifyToken($token);
 
-        $user = new User(collect($response)->toArray());
+        $user = new User();
 
-        if (!$user->is_email_verified) {
-            abort(403, 'Your email address is not verified.');
-        }
+        collect($response)->each(function ($data, $key) use ($user) {
+            $user->$key = $data;
+        });
 
-        if (!optional($user->broker_license)->is_license_verified) {
-            abort(403, 'Your license number is not verified.');
-        }
-
-        if (!optional($user->broker_license)->is_license_expired) {
-            abort(403, 'Your license number is expired.');
-        }
-
-        // login the user via auth
-        auth()->login($user);
-
-        // login the user via request
         $request->setUserResolver(function () use ($user) {
             return $user;
         });
