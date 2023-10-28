@@ -14,6 +14,7 @@ use App\Http\Requests\Post\{
     ShareRequest,
     SearchPinsRequest,
     SearchSharesRequest,
+    SearchOwnRequest,
 };
 use App\Models\Post;
 
@@ -150,5 +151,16 @@ class PostController extends Controller
     public function searchShares(SearchSharesRequest $request)
     {
         return $this->service->searchShares($request->validated());
+    }
+
+    /**
+     * Search for specific resources in the database.
+     *
+     * @param  \App\Http\Requests\Post\SearchOwnRequest  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function searchOwn(SearchOwnRequest $request)
+    {
+        return $this->service->searchOwn($request->validated());
     }
 }

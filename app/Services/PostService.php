@@ -144,4 +144,24 @@ class PostService extends Service implements PostServiceInterface
                 ->paginate()
         );
     }
+
+    /**
+     * Search for specific resources in the database.
+     *
+     * @param  array  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function searchOwn(array $request)
+    {
+        $search = Arr::get($request, 'search');
+
+        return $this->setResponseCollection(
+            request()
+                ->user()
+                ->posts()
+                ->where('content', 'LIKE', "%$search%")
+                ->orderBy('posts.created_at', 'desc')
+                ->paginate()
+        );
+    }
 }
