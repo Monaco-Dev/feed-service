@@ -6,9 +6,7 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 use App\Services\Contracts\PostServiceInterface;
-use App\Services\Contracts\ShareServiceInterface;
 use App\Services\PostService;
-use App\Services\ShareService;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -18,8 +16,7 @@ class AppServiceProvider extends ServiceProvider
      * @var array
      */
     public $bindings = [
-        PostServiceInterface::class => PostService::class,
-        ShareServiceInterface::class => ShareService::class
+        PostServiceInterface::class => PostService::class
     ];
 
     /**

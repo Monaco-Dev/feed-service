@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Arr;
 
 class Post extends Model
 {
@@ -46,7 +47,17 @@ class Post extends Model
      */
     protected $appends = [
         'is_verified',
-        'pinned_at'
+        'pinned_at',
+        'is_shared'
+    ];
+
+    /**
+     * The attributes that should be cast.
+     *
+     * @var array<string, string>
+     */
+    protected $casts = [
+        'content' => 'array'
     ];
 
     /**
@@ -102,6 +113,16 @@ class Post extends Model
                 optional(request()->user())->id
             )->first()
         )->created_at;
+    }
+
+    /**
+     * Append new attribute.
+     * 
+     * @return bool
+     */
+    public function getIsSharedAttribute()
+    {
+        return Arr::has($this->content, 'id');
     }
 
     /**

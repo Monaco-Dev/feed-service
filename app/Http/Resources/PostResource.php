@@ -24,7 +24,8 @@ class PostResource extends JsonResource
             'created_at',
             'updated_at',
             'pinned_at',
-            'shares_count'
+            'shares_count',
+            'is_shared'
         ]);
 
         Arr::set($data, 'user', new UserResource($this->whenLoaded('user')));

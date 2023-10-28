@@ -11,7 +11,9 @@ use App\Http\Requests\Post\{
     ShowRequest,
     PinRequest,
     UnpinRequest,
+    ShareRequest,
     SearchPinsRequest,
+    SearchSharesRequest,
 };
 use App\Models\Post;
 
@@ -117,6 +119,18 @@ class PostController extends Controller
     }
 
     /**
+     * Store a newly created resource in storage.
+     *
+     * @param  \App\Http\Requests\Post\ShareRequest  $request
+     * @param  \App\Models\Post $post
+     * @return \Illuminate\Http\Response
+     */
+    public function share(ShareRequest $request, Post $post)
+    {
+        return $this->service->share($post);
+    }
+
+    /**
      * Search for specific resources in the database.
      *
      * @param  \App\Http\Requests\Post\SearchPinsRequest  $request
@@ -125,5 +139,16 @@ class PostController extends Controller
     public function searchPins(SearchPinsRequest $request)
     {
         return $this->service->searchPins($request->validated());
+    }
+
+    /**
+     * Search for specific resources in the database.
+     *
+     * @param  \App\Http\Requests\Post\SearchSharesRequest  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function searchShares(SearchSharesRequest $request)
+    {
+        return $this->service->searchShares($request->validated());
     }
 }

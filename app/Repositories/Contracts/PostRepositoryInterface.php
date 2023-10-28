@@ -3,12 +3,13 @@
 namespace App\Repositories\Contracts;
 
 use App\Repositories\Support\BaseContracts\{
+    FindInterface as Find,
     CreateInterface as Create,
     UpdateInterface as Update,
     DeleteInterface as Delete
 };
 
-interface PostRepositoryInterface extends Create, Update, Delete
+interface PostRepositoryInterface extends Find, Create, Update, Delete
 {
     /**
      * Get paginated pin posts

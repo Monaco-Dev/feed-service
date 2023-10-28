@@ -10,7 +10,6 @@ use App\Models\Post;
 use App\Services\Contracts\PostServiceInterface;
 use App\Repositories\Contracts\{
     PostRepositoryInterface,
-    ShareRepositoryInterface
 };
 
 class PostService extends Service implements PostServiceInterface
@@ -23,22 +22,13 @@ class PostService extends Service implements PostServiceInterface
     protected $resourceClass = PostResource::class;
 
     /**
-     * @var \App\Repositories\Contracts\ShareRepositoryInterface
-     */
-    protected $shareRepository;
-
-    /**
      * Create the service instance and inject its repository.
      *
      * @param App\Repositories\Contracts\PostRepositoryInterface
-     * @param App\Repositories\Contracts\ShareRepositoryInterface
      */
-    public function __construct(
-        PostRepositoryInterface $repository,
-        ShareRepositoryInterface $shareRepository
-    ) {
+    public function __construct(PostRepositoryInterface $repository)
+    {
         $this->repository = $repository;
-        $this->shareRepository = $shareRepository;
     }
 
     /**
@@ -50,6 +40,9 @@ class PostService extends Service implements PostServiceInterface
     public function store(array $request)
     {
         Arr::set($request, 'user_id', optional(request()->user())->id);
+        Arr::set($request, 'content', [
+            'body' => Arr::get($request, 'content')
+        ]);
 
         return new PostResource(
             $this->repository->create($request)
@@ -112,6 +105,42 @@ class PostService extends Service implements PostServiceInterface
                 ->pins()
                 ->where('content', 'LIKE', "%$search%")
                 ->orderBy('pins.created_at', 'desc')
+                ->paginate()
+        );
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param  \App\Models\Post $post
+     * @return \Illuminate\Http\Response
+     */
+    public function share(Post $post)
+    {
+        $this->repository->create([
+            'user_id' => request()->user()->id,
+            'content' => $post->is_shared ? $this->repository->find($post->content->id)->toArray() : $post->toArray()
+        ]);
+
+        return request()->user()->shares()->attach($post);
+    }
+
+    /**
+     * Search for specific resources in the database.
+     *
+     * @param  array  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function searchShares(array $request)
+    {
+        $search = Arr::get($request, 'search');
+
+        return $this->setResponseCollection(
+            request()
+                ->user()
+                ->shares()
+                ->where('content', 'LIKE', "%$search%")
+                ->orderBy('shares.created_at', 'desc')
                 ->paginate()
         );
     }

@@ -66,4 +66,16 @@ class PostPolicy
     {
         return $post->is_verified && $user->pins()->where('post_id', $post->id)->exists();
     }
+
+    /**
+     * Determine whether the user can share the model.
+     * 
+     * @param App\Models\User $user
+     * @param App\Models\Post $post
+     * @return bool
+     */
+    public function share(User $user, Post $post): bool
+    {
+        return $post->is_verified;
+    }
 }

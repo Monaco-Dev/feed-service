@@ -172,10 +172,9 @@ class User extends Authenticatable
      */
     public function getUrlAttribute()
     {
-        $domain = config('services.web_url');
         $slug = optional(optional($this->slugs())->primary())->slug;
 
-        return $slug ? url("$domain/$slug") : null;
+        return $slug ? "/profile/$slug" : null;
     }
 
     /**
@@ -226,7 +225,9 @@ class User extends Authenticatable
      */
     public function shares()
     {
-        return $this->setConnection('mysql')->hasMany(Share::class);
+        return $this->setConnection('mysql')
+            ->belongsToMany(Post::class, 'shares')
+            ->withTimestamps();
     }
 
     /**
@@ -333,14 +334,14 @@ class User extends Authenticatable
      */
     public function scopeVerified(Builder $query): Builder
     {
-        $brokerLicenseModel = (new BrokerLicense)->getConnectionName();
-        $authDb = config("database.connections.$brokerLicenseModel.database");
+        // $brokerLicenseModel = (new BrokerLicense)->getConnectionName();
+        // $authDb = config("database.connections.$brokerLicenseModel.database");
 
         return $query->whereNotNull('email_verified_at')
             ->whereNull('deactivated_at')
-            ->whereNull('deleted_at')
-            ->whereHas('brokerLicense', function ($query) use ($authDb) {
-                $query->from("$authDb.broker_licenses")->verified();
-            });
+            ->whereNull('deleted_at');
+        // ->whereHas('brokerLicense', function ($query) use ($authDb) {
+        //     $query->from("$authDb.broker_licenses")->verified();
+        // });
     }
 }

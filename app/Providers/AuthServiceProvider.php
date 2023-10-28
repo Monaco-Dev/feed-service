@@ -30,5 +30,6 @@ class AuthServiceProvider extends ServiceProvider
         Gate::define('delete-post', [PostPolicy::class, 'delete']);
         Gate::define('pin-post', [PostPolicy::class, 'pin']);
         Gate::define('unpin-post', [PostPolicy::class, 'unpin']);
+        Gate::define('share-post', [PostPolicy::class, 'share']);
     }
 }

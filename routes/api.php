@@ -3,8 +3,7 @@
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\{
-    PostController,
-    ShareController
+    PostController
 };
 
 /*
@@ -26,19 +25,17 @@ Route::middleware('auth.user')->group(function () {
             Route::get('/', [PostController::class, 'show'])->name('show');
             Route::put('/', [PostController::class, 'update'])->name('update');
             Route::delete('/', [PostController::class, 'destroy'])->name('destroy');
+
             Route::post('pin', [PostController::class, 'pin'])->name('pin');
             Route::post('unpin', [PostController::class, 'unpin'])->name('unpin');
+
+            Route::post('share', [PostController::class, 'share'])->name('share');
         });
 
         Route::prefix('search')->name('search.')->group(function () {
             Route::post('/', [PostController::class, 'searchPosts'])->name('posts');
             Route::post('pins', [PostController::class, 'searchPins'])->name('pins');
+            Route::post('shares', [PostController::class, 'searchShares'])->name('shares');
         });
-    });
-
-    Route::prefix('shares')->group(function () {
-        Route::post('/', [ShareController::class, 'store'])->name('shares.store');
-        Route::get('/', [ShareController::class, 'index'])->name('shares.index');
-        Route::delete('{id}', [ShareController::class, 'destroy'])->name('shares.destroy');
     });
 });

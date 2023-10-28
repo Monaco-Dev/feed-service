@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('posts', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id');
-            $table->longText('content');
+            $table->json('content');
             $table->timestamps();
             $table->softDeletes();
         });
