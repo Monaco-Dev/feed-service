@@ -3,6 +3,7 @@
 namespace App\Services\Contracts;
 
 use App\Models\Post;
+use App\Models\User;
 use App\Services\Support\BaseContracts\{
     StoreInterface as Store,
     ShowInterface as Show,
@@ -64,7 +65,8 @@ interface PostServiceInterface extends Store, Show, Update, Destroy
      * Search for specific resources in the database.
      *
      * @param  array  $request
+     * @param  \App\Models\User $user
      * @return \Illuminate\Http\Response
      */
-    public function searchOwn(array $request);
+    public function searchWall(array $request, User $user);
 }

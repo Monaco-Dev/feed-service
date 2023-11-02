@@ -7,6 +7,7 @@ use Illuminate\Support\Arr;
 
 use App\Http\Resources\PostResource;
 use App\Models\Post;
+use App\Models\User;
 use App\Services\Contracts\PostServiceInterface;
 use App\Repositories\Contracts\{
     PostRepositoryInterface,
@@ -119,7 +120,9 @@ class PostService extends Service implements PostServiceInterface
     {
         $this->repository->create([
             'user_id' => request()->user()->id,
-            'content' => $post->is_shared ? $this->repository->find($post->content->id)->toArray() : $post->toArray()
+            'content' => $post->is_shared ?
+                $this->repository->find($post->content['id'])->toArray() :
+                $post->toArray()
         ]);
 
         return request()->user()->shares()->attach($post);
@@ -149,16 +152,15 @@ class PostService extends Service implements PostServiceInterface
      * Search for specific resources in the database.
      *
      * @param  array  $request
+     * @param  \App\Models\User $user
      * @return \Illuminate\Http\Response
      */
-    public function searchOwn(array $request)
+    public function searchWall(array $request, User $user)
     {
         $search = Arr::get($request, 'search');
 
         return $this->setResponseCollection(
-            request()
-                ->user()
-                ->posts()
+            $user->posts()
                 ->where('content', 'LIKE', "%$search%")
                 ->orderBy('posts.created_at', 'desc')
                 ->paginate()

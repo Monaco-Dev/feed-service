@@ -36,7 +36,7 @@ Route::middleware('auth.user')->group(function () {
             Route::post('/', [PostController::class, 'searchPosts'])->name('posts');
             Route::post('pins', [PostController::class, 'searchPins'])->name('pins');
             Route::post('shares', [PostController::class, 'searchShares'])->name('shares');
-            Route::post('own', [PostController::class, 'searchOwn'])->name('own');
+            Route::post('wall/{user}', [PostController::class, 'searchWall'])->name('wall');
         });
     });
 });

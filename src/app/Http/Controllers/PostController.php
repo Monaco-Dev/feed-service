@@ -14,9 +14,10 @@ use App\Http\Requests\Post\{
     ShareRequest,
     SearchPinsRequest,
     SearchSharesRequest,
-    SearchOwnRequest,
+    SearchWallRequest,
 };
 use App\Models\Post;
+use App\Models\User;
 
 class PostController extends Controller
 {
@@ -156,11 +157,12 @@ class PostController extends Controller
     /**
      * Search for specific resources in the database.
      *
-     * @param  \App\Http\Requests\Post\SearchOwnRequest  $request
+     * @param  \App\Http\Requests\Post\SearchWallRequest  $request
+     * @param  \App\Models\User $user
      * @return \Illuminate\Http\Response
      */
-    public function searchOwn(SearchOwnRequest $request)
+    public function searchWall(SearchWallRequest $request, User $user)
     {
-        return $this->service->searchOwn($request->validated());
+        return $this->service->searchWall($request->validated(), $user);
     }
 }

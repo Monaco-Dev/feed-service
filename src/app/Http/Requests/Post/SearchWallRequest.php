@@ -4,8 +4,16 @@ namespace App\Http\Requests\Post;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class SearchOwnRequest extends FormRequest
+class SearchWallRequest extends FormRequest
 {
+    /**
+     * Determine if the user is authorized to make this request.
+     */
+    public function authorize(): bool
+    {
+        return $this->user()->can('search-wall-post', $this->user);
+    }
+
     /**
      * Get the validation rules that apply to the request.
      *

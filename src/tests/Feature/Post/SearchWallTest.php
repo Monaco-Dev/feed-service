@@ -9,11 +9,11 @@ use Tests\TestCase;
 use App\Http\Middleware\PersonalAccessTokenAuthorization;
 use App\Models\User;
 
-class SearchOwnTest extends TestCase
+class SearchWallTest extends TestCase
 {
     use RefreshDatabase;
 
-    protected $route = 'posts.search.own';
+    protected $route = 'posts.search.wall';
 
     /**
      * Test successful response.
@@ -26,7 +26,7 @@ class SearchOwnTest extends TestCase
 
         $this->actingAs($user)
             ->withHeaders(['Accept' => 'application/json'])
-            ->post(route($this->route))
+            ->post(route($this->route, $user))
             ->assertOk();
     }
 }

@@ -53,6 +53,7 @@ class User extends Authenticatable
         'is_following',
         'is_follower',
         'is_connection',
+        'is_verified'
     ];
 
     /**
@@ -175,6 +176,16 @@ class User extends Authenticatable
         $slug = optional(optional($this->slugs())->primary())->slug;
 
         return $slug ? "/profile/$slug" : null;
+    }
+
+    /**
+     * Append new attribute.
+     * 
+     * @return bool
+     */
+    public function getIsVerifiedAttribute()
+    {
+        return !!$this->verified()->find($this->id);
     }
 
     /**

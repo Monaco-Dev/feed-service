@@ -8,8 +8,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Route;
 
-use App\Models\Post;
 use App\Exceptions\ModelNotFoundException;
+use App\Models\Post;
+use App\Models\User;
 
 class RouteServiceProvider extends ServiceProvider
 {
@@ -41,6 +42,10 @@ class RouteServiceProvider extends ServiceProvider
         });
 
         Route::model('post', Post::class, function () {
+            throw new ModelNotFoundException();
+        });
+
+        Route::model('user', User::class, function () {
             throw new ModelNotFoundException();
         });
     }

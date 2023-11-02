@@ -78,4 +78,16 @@ class PostPolicy
     {
         return $post->is_verified;
     }
+
+    /**
+     * Determine whether the user can search the model.
+     * 
+     * @param App\Models\User $user
+     * @param App\Models\User $model
+     * @return bool
+     */
+    public function searchWall(User $user, User $model): bool
+    {
+        return $model->is_verified;
+    }
 }

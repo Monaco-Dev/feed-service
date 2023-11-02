@@ -21,6 +21,7 @@ class UserResource extends JsonResource
             'id',
             'full_name',
             'url',
+            'is_verified'
         ];
 
         if (Arr::get($data, 'id') != optional(request()->user())->id) {
