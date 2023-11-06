@@ -7,15 +7,11 @@ use App\Http\Requests\Post\{
     StoreRequest,
     UpdateRequest,
     DestroyRequest,
-    SearchPostsRequest,
-    ShowRequest,
     PinRequest,
     UnpinRequest,
     ShareRequest,
-    SearchPinsRequest,
-    SearchSharesRequest,
-    SearchWallRequest,
 };
+use App\Http\Requests\SearchRequest;
 use App\Models\Post;
 use App\Models\User;
 
@@ -52,13 +48,12 @@ class PostController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  \App\Http\Requests\Post\ShowRequest $request
-     * @param  \App\Models\Post  $post
+     * @param  string $uuid
      * @return \Illuminate\Http\Response
      */
-    public function show(ShowRequest $request, Post $post)
+    public function show(string $uuid)
     {
-        return $this->service->show($post);
+        return $this->service->show($uuid);
     }
 
     /**
@@ -88,10 +83,10 @@ class PostController extends Controller
     /**
      * Search for specific resources in the database.
      *
-     * @param  \App\Http\Requests\Post\SearchPostsRequest  $request
+     * @param  \App\Http\Requests\SearchRequest  $request
      * @return \Illuminate\Http\Response
      */
-    public function searchPosts(SearchPostsRequest $request)
+    public function searchPosts(SearchRequest $request)
     {
         return $this->service->searchPosts($request->validated());
     }
@@ -135,10 +130,10 @@ class PostController extends Controller
     /**
      * Search for specific resources in the database.
      *
-     * @param  \App\Http\Requests\Post\SearchPinsRequest  $request
+     * @param  \App\Http\Requests\SearchRequest  $request
      * @return \Illuminate\Http\Response
      */
-    public function searchPins(SearchPinsRequest $request)
+    public function searchPins(SearchRequest $request)
     {
         return $this->service->searchPins($request->validated());
     }
@@ -146,10 +141,10 @@ class PostController extends Controller
     /**
      * Search for specific resources in the database.
      *
-     * @param  \App\Http\Requests\Post\SearchSharesRequest  $request
+     * @param  \App\Http\Requests\SearchRequest  $request
      * @return \Illuminate\Http\Response
      */
-    public function searchShares(SearchSharesRequest $request)
+    public function searchShares(SearchRequest $request)
     {
         return $this->service->searchShares($request->validated());
     }
@@ -157,12 +152,28 @@ class PostController extends Controller
     /**
      * Search for specific resources in the database.
      *
-     * @param  \App\Http\Requests\Post\SearchWallRequest  $request
+     * @param  \App\Http\Requests\SearchRequest  $request
      * @param  \App\Models\User $user
      * @return \Illuminate\Http\Response
      */
-    public function searchWall(SearchWallRequest $request, User $user)
+    public function searchWall(SearchRequest $request, User $user)
     {
+        $this->authorizeForUser(request()->user(), 'search-wall-post', $user);
+
         return $this->service->searchWall($request->validated(), $user);
+    }
+
+    /**
+     * Search for specific resources in the database.
+     *
+     * @param  \App\Http\Requests\SearchRequest  $request
+     * @param  \App\Models\Post $post
+     * @return \Illuminate\Http\Response
+     */
+    public function searchMatches(SearchRequest $request, Post $post)
+    {
+        $this->authorizeForUser(request()->user(), 'search-matches-post', $post);
+
+        return $this->service->searchMatches($request->validated(), $post);
     }
 }

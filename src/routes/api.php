@@ -3,7 +3,8 @@
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\{
-    PostController
+    PostController,
+    TagController
 };
 
 /*
@@ -20,9 +21,9 @@ use App\Http\Controllers\{
 Route::middleware('auth.user')->group(function () {
     Route::prefix('posts')->name('posts.')->group(function () {
         Route::post('/', [PostController::class, 'store'])->name('store');
+        Route::get('{uuid}', [PostController::class, 'show'])->middleware('post')->name('show');
 
         Route::prefix('{post}')->group(function () {
-            Route::get('/', [PostController::class, 'show'])->name('show');
             Route::put('/', [PostController::class, 'update'])->name('update');
             Route::delete('/', [PostController::class, 'destroy'])->name('destroy');
 
@@ -37,6 +38,11 @@ Route::middleware('auth.user')->group(function () {
             Route::post('pins', [PostController::class, 'searchPins'])->name('pins');
             Route::post('shares', [PostController::class, 'searchShares'])->name('shares');
             Route::post('wall/{user}', [PostController::class, 'searchWall'])->name('wall');
+            Route::post('{post}/matches', [PostController::class, 'searchMatches'])->name('matches');
         });
+    });
+
+    Route::prefix('tags')->name('tags.')->group(function () {
+        Route::post('search', [TagController::class, 'search'])->name('search');
     });
 });

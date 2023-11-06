@@ -17,8 +17,9 @@ class PostResource extends JsonResource
     {
         $data = parent::toArray($request);
 
-        $data = Arr::only($data, [
+        $fields = [
             'id',
+            'uuid',
             'user_id',
             'content',
             'created_at',
@@ -26,7 +27,15 @@ class PostResource extends JsonResource
             'pinned_at',
             'shares_count',
             'is_shared'
-        ]);
+        ];
+
+        if (Arr::get($data, 'user_id') == optional(request()->user())->id) {
+            $fields = array_merge($fields, [
+                'matches_count'
+            ]);
+        }
+
+        $data = Arr::only($data, $fields);
 
         Arr::set($data, 'user', new UserResource($this->whenLoaded('user')));
 

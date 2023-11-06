@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Post;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UpdateRequest extends FormRequest
 {
@@ -24,8 +25,12 @@ class UpdateRequest extends FormRequest
         return [
             'content' => [
                 'required',
-                'sometimes',
                 'string'
+            ],
+            'type' => [
+                'required',
+                'string',
+                Rule::in(config('constants.post.types'))
             ]
         ];
     }

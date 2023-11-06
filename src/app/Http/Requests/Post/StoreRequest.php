@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Post;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StoreRequest extends FormRequest
 {
@@ -17,6 +18,11 @@ class StoreRequest extends FormRequest
             'content' => [
                 'required',
                 'string'
+            ],
+            'type' => [
+                'required',
+                'string',
+                Rule::in(config('constants.post.types'))
             ]
         ];
     }

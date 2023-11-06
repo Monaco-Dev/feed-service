@@ -24,4 +24,12 @@ interface PostRepositoryInterface extends Find, Create, Update, Delete
      * @return \Illuminate\Database\Eloquent\Model
      */
     public function shares();
+
+    /**
+     * Display the specified resource.
+     *
+     * @param string $uuid
+     * @return \Illuminate\Database\Eloquent\Model
+     */
+    public function view(string $uuid);
 }

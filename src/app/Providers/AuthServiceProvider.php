@@ -25,12 +25,12 @@ class AuthServiceProvider extends ServiceProvider
     {
         $this->registerPolicies();
 
-        Gate::define('view-post', [PostPolicy::class, 'view']);
         Gate::define('update-post', [PostPolicy::class, 'update']);
         Gate::define('delete-post', [PostPolicy::class, 'delete']);
         Gate::define('pin-post', [PostPolicy::class, 'pin']);
         Gate::define('unpin-post', [PostPolicy::class, 'unpin']);
         Gate::define('share-post', [PostPolicy::class, 'share']);
         Gate::define('search-wall-post', [PostPolicy::class, 'searchWall']);
+        Gate::define('search-matches-post', [PostPolicy::class, 'searchMatches']);
     }
 }

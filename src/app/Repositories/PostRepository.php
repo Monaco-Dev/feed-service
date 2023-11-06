@@ -22,6 +22,17 @@ class PostRepository extends Repository implements PostRepositoryInterface
     }
 
     /**
+     * Display the specified resource.
+     *
+     * @param string $uuid
+     * @return \Illuminate\Database\Eloquent\Model
+     */
+    public function view(string $uuid)
+    {
+        return $this->model->verified()->whereUuid($uuid)->first();
+    }
+
+    /**
      * Get paginated pinned posts
      * 
      * @return \Illuminate\Database\Eloquent\Model

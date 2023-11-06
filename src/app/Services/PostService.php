@@ -4,17 +4,20 @@ namespace App\Services;
 
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 
+use App\Models\Tag;
 use App\Http\Resources\PostResource;
-use App\Models\Post;
-use App\Models\User;
 use App\Services\Contracts\PostServiceInterface;
-use App\Repositories\Contracts\{
-    PostRepositoryInterface,
-};
+use App\Repositories\Contracts\PostRepositoryInterface;
+use App\Services\Support\Traits\Post\Pinnable;
+use App\Services\Support\Traits\Post\Searchable;
+use App\Services\Support\Traits\Post\Shareable;
 
 class PostService extends Service implements PostServiceInterface
 {
+    use Searchable, Shareable, Pinnable;
+
     /**
      * Resource class of the service.
      * 
@@ -33,6 +36,29 @@ class PostService extends Service implements PostServiceInterface
     }
 
     /**
+     * Prepare form request data.
+     * 
+     * @param array $request
+     * @return array
+     */
+    private function mapRequest(array $request)
+    {
+        $content = Arr::get($request, 'content');
+        $type = Arr::get($request, 'type');
+        preg_match_all('/#([\w]+)/', $content, $tags);
+
+        Arr::set($request, 'tags', $tags[1]);
+        Arr::set($request, 'uuid', Str::uuid());
+        Arr::set($request, 'user_id', optional(request()->user())->id);
+        Arr::set($request, 'content', [
+            'body' => $content,
+            'type' => $type
+        ]);
+
+        return $request;
+    }
+
+    /**
      * Store a newly created resource in storage.
      *
      * @param array $request
@@ -40,130 +66,64 @@ class PostService extends Service implements PostServiceInterface
      */
     public function store(array $request)
     {
-        Arr::set($request, 'user_id', optional(request()->user())->id);
-        Arr::set($request, 'content', [
-            'body' => Arr::get($request, 'content')
-        ]);
+        $request = $this->mapRequest($request);
 
-        return new PostResource(
-            $this->repository->create($request)
-        );
+        $post = $this->repository->create(Arr::except($request, ['tags']));
+
+        $post->syncTags(Arr::get($request, 'tags'));
+
+        return new PostResource($post);
     }
 
     /**
-     * Search for specific resources in the database.
-     * 
-     * @param array $request
-     * @return \Illuminate\Http\Response
-     */
-    public function searchPosts(array $request)
-    {
-        $search = Arr::get($request, 'search');
-
-        return $this->setResponseCollection(
-            $this->repository
-                ->model()
-                ->search($search)
-                ->paginate()
-        );
-    }
-
-    /**
-     * Store a newly created resource in storage.
+     * Update the specified resource in storage.
      *
-     * @param  \App\Models\Post $post
-     * @return \Illuminate\Http\Response
+     * @param mixed $model
+     * @param array $request
+     * @return mixed
      */
-    public function pin(Post $post)
+    public function update(mixed $model, array $request)
     {
-        return request()->user()->pins()->attach($post);
+        $request = $this->mapRequest($request);
+
+        $this->repository->update($model, Arr::except($request, ['tags']));
+
+        $model->syncTags(Arr::get($request, 'tags'));
+
+        Tag::doesntHave('taggables')->delete();
+
+        return new PostResource($model);
+    }
+
+    /**
+     * Display the specified resource.
+     *
+     * @param mixed $uuid
+     * @param bool $findOrFail
+     * @return \Illuminate\Http\Resources\Json\JsonResource|\Illuminate\Database\Eloquent\Model|null
+     */
+    public function show(mixed $uuid, bool $findOrFail = true)
+    {
+        $data = $this->repository->view($uuid);
+
+        return isset($data)
+            ? $this->setResponseResource($data)
+            : null;
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\Post  $post
-     * @return \Illuminate\Http\Response
+     * @param mixed $model
+     * @return mixed
      */
-    public function unpin(Post $post)
+    public function destroy(mixed $model)
     {
-        return request()->user()->pins()->detach($post);
-    }
+        $model->syncTags([]);
+        $model->delete();
 
-    /**
-     * Search for specific resources in the database.
-     *
-     * @param  array  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function searchPins(array $request)
-    {
-        $search = Arr::get($request, 'search');
+        Tag::doesntHave('taggables')->delete();
 
-        return $this->setResponseCollection(
-            request()
-                ->user()
-                ->pins()
-                ->where('content', 'LIKE', "%$search%")
-                ->orderBy('pins.created_at', 'desc')
-                ->paginate()
-        );
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \App\Models\Post $post
-     * @return \Illuminate\Http\Response
-     */
-    public function share(Post $post)
-    {
-        $this->repository->create([
-            'user_id' => request()->user()->id,
-            'content' => $post->is_shared ?
-                $this->repository->find($post->content['id'])->toArray() :
-                $post->toArray()
-        ]);
-
-        return request()->user()->shares()->attach($post);
-    }
-
-    /**
-     * Search for specific resources in the database.
-     *
-     * @param  array  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function searchShares(array $request)
-    {
-        $search = Arr::get($request, 'search');
-
-        return $this->setResponseCollection(
-            request()
-                ->user()
-                ->shares()
-                ->where('content', 'LIKE', "%$search%")
-                ->orderBy('shares.created_at', 'desc')
-                ->paginate()
-        );
-    }
-
-    /**
-     * Search for specific resources in the database.
-     *
-     * @param  array  $request
-     * @param  \App\Models\User $user
-     * @return \Illuminate\Http\Response
-     */
-    public function searchWall(array $request, User $user)
-    {
-        $search = Arr::get($request, 'search');
-
-        return $this->setResponseCollection(
-            $user->posts()
-                ->where('content', 'LIKE', "%$search%")
-                ->orderBy('posts.created_at', 'desc')
-                ->paginate()
-        );
+        return response()->json(true);
     }
 }

@@ -21,8 +21,10 @@ class PostFactory extends Factory
         return [
             'user_id' => User::factory(),
             'content' => [
-                'body' => fake()->paragraph()
-            ]
+                'body' => fake()->paragraph(),
+                'type' => fake()->randomElement(config('constants.post.types'))
+            ],
+            'uuid' => fake()->uuid()
         ];
     }
 }

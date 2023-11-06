@@ -27,7 +27,8 @@ class StoreTest extends TestCase
         $post = Post::factory()->make();
 
         $payload = [
-            'content' => $post->content['body']
+            'content' => $post->content['body'],
+            'type' => $post->content['type']
         ];
 
         $this->actingAs($user)

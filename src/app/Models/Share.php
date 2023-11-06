@@ -6,9 +6,11 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+use App\Models\Support\Share\Relationships;
+
 class Share extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes, Relationships;
 
     /**
      * The connection name for the model.
@@ -26,24 +28,4 @@ class Share extends Model
         'user_id',
         'post_id'
     ];
-
-    /**
-     * Return Post relationship.
-     * 
-     * @return App\Models\Post
-     */
-    public function post()
-    {
-        return $this->belongsTo(Post::class);
-    }
-
-    /**
-     * Return User relationship.
-     * 
-     * @return App\Models\User
-     */
-    public function user()
-    {
-        return $this->belongsTo(User::class);
-    }
 }

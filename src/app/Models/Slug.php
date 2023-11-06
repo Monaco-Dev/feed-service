@@ -4,11 +4,20 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Builder;
+
+use App\Models\Support\Slug\Relationships;
+use App\Models\Support\Slug\Scopes;
 
 class Slug extends Model
 {
-    use HasFactory;
+    use HasFactory, Scopes, Relationships;
+
+    /**
+     * The connection name for the model.
+     * 
+     * @var string
+     */
+    protected $connection = 'auth_mysql';
 
     /**
      * The attributes that should be cast.
@@ -18,24 +27,4 @@ class Slug extends Model
     protected $casts = [
         'is_primary' => 'boolean'
     ];
-
-    /**
-     * Return User relationship.
-     * 
-     * @return App\Models\User
-     */
-    public function user()
-    {
-        return $this->belongsTo(User::class);
-    }
-
-    /**
-     * Get primary slug only.
-     * 
-     * @return Illuminate\Database\Eloquent\Model
-     */
-    public function scopePrimary(Builder $query)
-    {
-        return $query->where('is_primary', true)->first();
-    }
 }

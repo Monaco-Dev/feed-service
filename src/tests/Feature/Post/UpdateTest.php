@@ -34,10 +34,16 @@ class UpdateTest extends TestCase
         $this->withoutMiddleware([PersonalAccessTokenAuthorization::class]);
 
         $user = User::factory()->hasPosts()->create();
+        $post = $user->posts()->first();
+
+        $payload = [
+            'content' => $post->content['body'],
+            'type' => $post->content['type']
+        ];
 
         $this->actingAs($user)
             ->withHeaders(['Accept' => 'application/json'])
-            ->put(route($this->route, $user->posts()->first()))
+            ->put(route($this->route, $post), $payload)
             ->assertOk();
     }
 

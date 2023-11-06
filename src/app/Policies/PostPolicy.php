@@ -8,18 +8,6 @@ use App\Models\User;
 class PostPolicy
 {
     /**
-     * Determine whether the user can view the model.
-     * 
-     * @param App\Models\User $user
-     * @param App\Models\Post $post
-     * @return bool
-     */
-    public function view(User $user, Post $post): bool
-    {
-        return $post->is_verified;
-    }
-
-    /**
      * Determine whether the user can update the model.
      * 
      * @param App\Models\User $user
@@ -89,5 +77,17 @@ class PostPolicy
     public function searchWall(User $user, User $model): bool
     {
         return $model->is_verified;
+    }
+
+    /**
+     * Determine whether the user can search the model.
+     * 
+     * @param App\Models\User $user
+     * @param App\Models\Post $post
+     * @return bool
+     */
+    public function searchMatches(User $user, Post $post): bool
+    {
+        return $post->is_verified;
     }
 }

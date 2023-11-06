@@ -6,7 +6,9 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 use App\Services\Contracts\PostServiceInterface;
+use App\Services\Contracts\TagServiceInterface;
 use App\Services\PostService;
+use App\Services\TagService;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -16,7 +18,8 @@ class AppServiceProvider extends ServiceProvider
      * @var array
      */
     public $bindings = [
-        PostServiceInterface::class => PostService::class
+        PostServiceInterface::class => PostService::class,
+        TagServiceInterface::class => TagService::class,
     ];
 
     /**
