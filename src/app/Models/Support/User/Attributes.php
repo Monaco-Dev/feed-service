@@ -119,18 +119,6 @@ trait Attributes
      * 
      * @return bool
      */
-    public function getUrlAttribute()
-    {
-        $slug = optional(optional($this->slugs())->primary())->slug;
-
-        return $slug ? "/profile/$slug" : null;
-    }
-
-    /**
-     * Append new attribute.
-     * 
-     * @return bool
-     */
     public function getIsVerifiedAttribute()
     {
         return !!$this->verified()->find($this->id);

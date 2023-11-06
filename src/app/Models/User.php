@@ -54,7 +54,6 @@ class User extends Authenticatable
         'is_email_verified',
         'is_deactivated',
         'full_name',
-        'url',
         'is_incoming_invite',
         'is_outgoing_invite',
         'is_following',

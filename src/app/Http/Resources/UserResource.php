@@ -20,7 +20,7 @@ class UserResource extends JsonResource
         $fields = [
             'id',
             'full_name',
-            'url',
+            'slug',
             'is_verified'
         ];
 

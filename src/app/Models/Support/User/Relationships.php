@@ -4,7 +4,6 @@ namespace App\Models\Support\User;
 
 use App\Models\BrokerLicense;
 use App\Models\Post;
-use App\Models\Slug;
 use App\Models\User;
 
 trait Relationships
@@ -17,16 +16,6 @@ trait Relationships
     public function brokerLicense()
     {
         return $this->setConnection('auth_mysql')->hasOne(BrokerLicense::class);
-    }
-
-    /**
-     * Return Slug relationship.
-     * 
-     * @return App\Models\Slug
-     */
-    public function slugs()
-    {
-        return $this->setConnection('auth_mysql')->hasMany(Slug::class);
     }
 
     /**
