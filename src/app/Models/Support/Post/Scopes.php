@@ -70,18 +70,18 @@ trait Scopes
         }
 
         return $query->groupBy(['posts.id'])
-            ->orderBy('posts.created_at', 'desc')
+            ->orderBy('posts.updated_at', 'desc')
             ->orderBy(function ($query) use ($authDb, $userId) {
                 return $query->from("$authDb.follows")
                     ->whereRaw('`follows`.follow_user_id = `posts`.user_id')
                     ->whereRaw('`follows`.user_id = ?', [$userId])
-                    ->select('posts.created_at');
+                    ->select('posts.updated_at');
             }, 'desc')
             ->orderBy(function ($query) use ($authDb, $userId) {
                 return $query->from("$authDb.connections")
                     ->whereRaw('`connections`.connection_user_id = `posts`.user_id')
                     ->whereRaw('`connections`.user_id = ?', [$userId])
-                    ->select('posts.created_at');
+                    ->select('posts.updated_at');
             }, 'desc');
     }
 
@@ -117,14 +117,14 @@ trait Scopes
                 return $query->from("$authDb.connections")
                     ->whereRaw('`connections`.connection_user_id = `posts`.user_id')
                     ->whereRaw('`connections`.user_id = ?', [$userId])
-                    ->select('posts.created_at');
+                    ->select('posts.updated_at');
             }, 'desc')
             ->orderBy(function ($query) use ($authDb, $userId) {
                 return $query->from("$authDb.follows")
                     ->whereRaw('`follows`.follow_user_id = `posts`.user_id')
                     ->whereRaw('`follows`.user_id = ?', [$userId])
-                    ->select('posts.created_at');
+                    ->select('posts.updated_at');
             }, 'desc')
-            ->orderBy('posts.created_at', 'desc');
+            ->orderBy('posts.updated_at', 'desc');
     }
 }

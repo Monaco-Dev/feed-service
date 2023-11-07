@@ -48,7 +48,6 @@ class PostService extends Service implements PostServiceInterface
         preg_match_all('/#([\w]+)/', $content, $tags);
 
         Arr::set($request, 'tags', $tags[1]);
-        Arr::set($request, 'uuid', Str::uuid());
         Arr::set($request, 'user_id', optional(request()->user())->id);
         Arr::set($request, 'content', [
             'body' => $content,
@@ -67,6 +66,7 @@ class PostService extends Service implements PostServiceInterface
     public function store(array $request)
     {
         $request = $this->mapRequest($request);
+        Arr::set($request, 'uuid', Str::uuid());
 
         $post = $this->repository->create(Arr::except($request, ['tags']));
 

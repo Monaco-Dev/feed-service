@@ -40,4 +40,14 @@ trait Attributes
     {
         return Arr::has($this->content, 'id');
     }
+
+    /**
+     * Append new attribute.
+     * 
+     * @return bool
+     */
+    public function getIsEditedAttribute()
+    {
+        return $this->created_at != $this->updated_at;
+    }
 }

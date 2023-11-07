@@ -65,6 +65,7 @@ class Post extends Model
         'is_verified',
         'pinned_at',
         'is_shared',
+        'is_edited'
     ];
 
     /**

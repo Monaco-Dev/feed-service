@@ -26,7 +26,8 @@ class PostResource extends JsonResource
             'updated_at',
             'pinned_at',
             'shares_count',
-            'is_shared'
+            'is_shared',
+            'is_edited'
         ];
 
         if (Arr::get($data, 'user_id') == optional(request()->user())->id) {
