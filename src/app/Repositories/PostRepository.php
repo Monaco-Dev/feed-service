@@ -29,7 +29,11 @@ class PostRepository extends Repository implements PostRepositoryInterface
      */
     public function view(string $uuid)
     {
-        return $this->model->verified()->whereUuid($uuid)->first();
+        return $this->model
+            ->withMatchesCount()
+            ->verified()
+            ->whereUuid($uuid)
+            ->first();
     }
 
     /**

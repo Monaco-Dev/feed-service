@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Services\Contracts\TagServiceInterface;
-use App\Http\Requests\Tag\SearchRequest;
+use App\Http\Requests\SearchRequest;
 
 class TagController extends Controller
 {
@@ -27,7 +27,7 @@ class TagController extends Controller
     /**
      * Search for specific resources in the database.
      *
-     * @param  \App\Http\Requests\Tag\SearchRequest  $request
+     * @param  \App\Http\Requests\SearchRequest  $request
      * @return \Illuminate\Http\Response
      */
     public function search(SearchRequest $request)

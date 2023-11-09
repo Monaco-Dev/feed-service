@@ -16,15 +16,39 @@ trait Scopes
      */
     public function scopeWithMatchesCount(Builder $query): Builder
     {
-        return $query->selectRaw(
-            DB::raw("(
-            select count(distinct tb1.taggable_id) as matches_count from taggables as tb1
-            where tb1.taggable_id != posts.id
-            and tb1.tag_id in (
-                select tb2.tag_id from taggables as tb2
-                where tb2.taggable_id = posts.id
-            )) as matches_count")
-        );
+        return $query
+            ->selectRaw("
+                (
+                    select count(*) from posts as p1
+                    where p1.user_id != posts.user_id
+                    and p1.content->'$.type' = 
+                        IF(
+                            posts.content->'$.type' = 'FS', 
+                            'WTB', 
+                            IF(
+                                posts.content->'$.type' = 'WTB',
+                                'FS',
+                                IF(
+                                    posts.content->'$.type' = 'FR',
+                                    'WTR',
+                                    IF(
+                                        posts.content->'$.type' = 'WTR',
+                                        'FR',
+                                        null
+                                    )
+                                )
+                            )
+                        )
+                    and exists (
+                        select * from taggables as tb1
+                        where tb1.taggable_id = p1.id
+                        and tb1.tag_id in (
+                            select tb2.tag_id from taggables as tb2
+                            where tb2.taggable_id = posts.id
+                        )
+                    )
+                ) as matches_count
+            ");
     }
 
     /**
@@ -89,12 +113,13 @@ trait Scopes
      * Wildcard search query
      * 
      * @param Illuminate\Database\Eloquent\Builder $query
-     * @param collection $tags
+     * @param App\Models\Post $post
      * @param string|null $search
      * @return Illuminate\Database\Eloquent\Builder
      */
-    public function scopeSearchMatches(Builder $query, $tags, $search = null): Builder
+    public function scopeSearchMatches(Builder $query, $post, $search = null): Builder
     {
+        $tags = $post->tags;
         $tagNames = $tags->pluck('name')->all();
         $tagIds = $tags->pluck('id')->all();
 
@@ -109,8 +134,31 @@ trait Scopes
             }
         ])
             ->withAnyTags($tagNames)
-            ->where('posts.id', '!=', optional(request()->user())->id)
+            ->where('posts.user_id', '!=', optional(request()->user())->id)
             ->where('posts.content', 'LIKE', "%$search%")
+            ->whereRaw("
+                (
+                    select p1.content->'$.type' as type from posts as p1
+                    where p1.id = $post->id
+                ) =
+                    IF(
+                        posts.content->'$.type' = 'FS', 
+                        'WTB', 
+                        IF(
+                            posts.content->'$.type' = 'WTB',
+                            'FS',
+                            IF(
+                                posts.content->'$.type' = 'FR',
+                                'WTR',
+                                IF(
+                                    posts.content->'$.type' = 'WTR',
+                                    'FR',
+                                    null
+                                )
+                            )
+                        )
+                    )
+            ")
             ->groupBy(['posts.id'])
             ->orderBy('match_tags_count', 'desc')
             ->orderBy(function ($query) use ($authDb, $userId) {

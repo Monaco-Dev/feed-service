@@ -58,10 +58,10 @@ trait Searchable
     {
         $search = Arr::get($request, 'search');
 
-        $tags = $post->tags;
-
         return $this->setResponseCollection(
-            $post->searchMatches($tags, $search)->paginate()
+            $this->repository->model()
+                ->searchMatches($post, $search)
+                ->paginate()
         );
     }
 }

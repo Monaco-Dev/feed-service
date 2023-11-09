@@ -32,6 +32,6 @@ class TagService extends Service implements TagServiceInterface
 
         if (Arr::get($request, 'search')) $model = $model->containing(Arr::get($request, 'search'));
 
-        return $model->paginate();
+        return $model->paginate(5);
     }
 }
