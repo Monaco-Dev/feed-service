@@ -5,6 +5,7 @@ namespace App\Services\Support\Traits\Post;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 
+use App\Http\Resources\PostResource;
 use App\Models\Post;
 
 trait Shareable
@@ -17,7 +18,7 @@ trait Shareable
      */
     public function share(Post $post)
     {
-        $this->repository->create([
+        $post = $this->repository->create([
             'uuid' => Str::uuid(),
             'user_id' => request()->user()->id,
             'content' => $post->is_shared ?
@@ -25,7 +26,9 @@ trait Shareable
                 $post->toArray()
         ]);
 
-        return request()->user()->shares()->attach($post);
+        request()->user()->shares()->attach($post);
+
+        return new PostResource($post);
     }
 
     /**

@@ -2,6 +2,7 @@
 
 namespace App\Services\Support\Traits\Post;
 
+use App\Http\Resources\PostResource;
 use Illuminate\Support\Arr;
 
 use App\Models\Post;
@@ -16,7 +17,9 @@ trait Pinnable
      */
     public function pin(Post $post)
     {
-        return request()->user()->pins()->attach($post);
+        request()->user()->pins()->attach($post);
+
+        return new PostResource($post);
     }
 
     /**
@@ -27,7 +30,9 @@ trait Pinnable
      */
     public function unpin(Post $post)
     {
-        return request()->user()->pins()->detach($post);
+        request()->user()->pins()->detach($post);
+
+        return new PostResource($post);
     }
 
     /**
