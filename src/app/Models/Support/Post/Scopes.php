@@ -3,7 +3,6 @@
 namespace App\Models\Support\Post;
 
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Facades\DB;
 
 use App\Models\User;
 
