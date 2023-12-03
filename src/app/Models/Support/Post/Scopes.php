@@ -47,11 +47,11 @@ trait Scopes
                         )
                     )
                     and exists (
-                        select * from monaco_auth.users as u1
-                        where u1.id = p1.user_id
-                        and u1.email_verified_at != null
-                        and u1.deactivated_at = null
-                        and u1.deleted_at = null
+                        select * from monaco_auth.users as test1
+                        where test1.id = p1.user_id
+                        and test1.email_verified_at is not null
+                        and test1.deactivated_at is null
+                        and test1.deleted_at is null
                     )
                 ) as matches_count
             ");
