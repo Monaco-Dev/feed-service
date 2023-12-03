@@ -47,6 +47,13 @@ trait Scopes
                             where tb2.taggable_id = posts.id
                         )
                     )
+                    and exists (
+                        select * from monaco_auth.users as u1
+                        where u1.id = p1.user_id
+                        and u1.email_verified_at != null
+                        and u1.deactivated_at = null
+                        and u1.deleted_at = null
+                    )
                 ) as matches_count
             ");
     }
@@ -88,12 +95,16 @@ trait Scopes
         if ($search) {
             $query = $query->where('posts.content', 'LIKE', "%$search%");
         } else {
-            $query = $query->where('posts.user_id', $userId)
-                ->orWhere('c1.user_id', $userId)
-                ->orWhere('f1.user_id', $userId);
+            $query = $query->where(function ($query) use ($userId) {
+                $query->where('posts.user_id', $userId)
+                    ->orWhere('c1.user_id', $userId)
+                    ->orWhere('f1.user_id', $userId);
+            });
         }
 
-        return $query->groupBy(['posts.id'])
+        return $query
+            ->verified()
+            ->groupBy(['posts.id'])
             ->orderBy('posts.updated_at', 'desc')
             ->orderBy(function ($query) use ($authDb, $userId) {
                 return $query->from("$authDb.follows")
@@ -159,6 +170,7 @@ trait Scopes
                         )
                     )
             ")
+            ->verified()
             ->groupBy(['posts.id'])
             ->orderBy('match_tags_count', 'desc')
             ->orderBy(function ($query) use ($authDb, $userId) {
