@@ -11,9 +11,9 @@ return [
     'post' => [
         'types' => [
             'fs' => 'FS',
-            'fr' => 'FR',
+            'fl' => 'FL',
             'wtb' => 'WTB',
-            'wtr' => 'WTR',
+            'wtl' => 'WTL',
         ]
     ],
 
