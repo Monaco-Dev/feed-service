@@ -28,11 +28,11 @@ trait Scopes
                                 posts.content->'$.type' = 'WTB',
                                 'FS',
                                 IF(
-                                    posts.content->'$.type' = 'FR',
-                                    'WTR',
+                                    posts.content->'$.type' = 'FL',
+                                    'WTL',
                                     IF(
-                                        posts.content->'$.type' = 'WTR',
-                                        'FR',
+                                        posts.content->'$.type' = 'WTL',
+                                        'FL',
                                         null
                                     )
                                 )
@@ -158,11 +158,11 @@ trait Scopes
                             posts.content->'$.type' = 'WTB',
                             'FS',
                             IF(
-                                posts.content->'$.type' = 'FR',
-                                'WTR',
+                                posts.content->'$.type' = 'FL',
+                                'WTL',
                                 IF(
-                                    posts.content->'$.type' = 'WTR',
-                                    'FR',
+                                    posts.content->'$.type' = 'WTL',
+                                    'FL',
                                     null
                                 )
                             )
