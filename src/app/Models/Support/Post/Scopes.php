@@ -186,4 +186,22 @@ trait Scopes
             }, 'desc')
             ->orderBy('posts.updated_at', 'desc');
     }
+
+    /**
+     * Wildcard search query
+     * 
+     * @param Illuminate\Database\Eloquent\Builder $query
+     * @param string|null $search
+     * @return Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeSearchArchives(Builder $query, $search = null): Builder
+    {
+        $userId = optional(request()->user())->id;
+
+        return $query->withTrashed()
+            ->whereNotNull('deleted_at')
+            ->whereUserId($userId)
+            ->where('posts.content', 'LIKE', "%$search%")
+            ->orderBy('posts.updated_at', 'desc');
+    }
 }

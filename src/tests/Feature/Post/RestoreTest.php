@@ -10,11 +10,11 @@ use App\Http\Middleware\PersonalAccessTokenAuthorization;
 use App\Models\Post;
 use App\Models\User;
 
-class SearchMatchesTest extends TestCase
+class RestoreTest extends TestCase
 {
     use RefreshDatabase;
 
-    protected $route = 'posts.search.matches';
+    protected $route = 'posts.restore';
 
     /**
      * Test not found response.
@@ -33,11 +33,15 @@ class SearchMatchesTest extends TestCase
     {
         $this->withoutMiddleware([PersonalAccessTokenAuthorization::class]);
 
-        $user = User::factory()->hasBrokerLicense()->hasPosts()->create();
+        $user = User::factory()->hasPosts()->create();
+
+        $post = $user->posts()->first();
+
+        $post->delete();
 
         $this->actingAs($user)
             ->withHeaders(['Accept' => 'application/json'])
-            ->post(route($this->route, $user->posts()->first()))
+            ->post(route($this->route, $post->id))
             ->assertOk();
     }
 
@@ -51,9 +55,11 @@ class SearchMatchesTest extends TestCase
         $user = User::factory()->create();
         $post = Post::factory()->create();
 
+        $post->delete();
+
         $this->actingAs($user)
             ->withHeaders(['Accept' => 'application/json'])
-            ->post(route($this->route, $post))
+            ->post(route($this->route, $post->id))
             ->assertForbidden();
     }
 }

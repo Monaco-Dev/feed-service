@@ -45,6 +45,14 @@ class RouteServiceProvider extends ServiceProvider
             throw new ModelNotFoundException();
         });
 
+        Route::bind('trashed_post', function ($id) {
+            try {
+                return Post::onlyTrashed()->findOrFail($id);
+            } catch (\Exception $e) {
+                throw new ModelNotFoundException();
+            }
+        });
+
         Route::model('user', User::class, function () {
             throw new ModelNotFoundException();
         });

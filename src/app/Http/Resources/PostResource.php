@@ -24,6 +24,7 @@ class PostResource extends JsonResource
             'content',
             'created_at',
             'updated_at',
+            'deleted_at',
             'pinned_at',
             'shares_count',
             'is_shared',

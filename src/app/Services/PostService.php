@@ -115,14 +115,28 @@ class PostService extends Service implements PostServiceInterface
      * Remove the specified resource from storage.
      *
      * @param mixed $model
-     * @return mixed
+     * @return \Illuminate\Http\Response
      */
     public function destroy(mixed $model)
     {
-        $model->syncTags([]);
+        $tags = $model->tags()->get();
+
         $model->delete();
 
-        Tag::doesntHave('taggables')->delete();
+        $model->syncTags($tags);
+
+        return response()->json(true);
+    }
+
+    /**
+     * Restore the specified resource in storage.
+     *
+     * @param  \App\Models\Post $post
+     * @return \Illuminate\Http\Response
+     */
+    public function restore(mixed $post)
+    {
+        $post->restore();
 
         return response()->json(true);
     }
