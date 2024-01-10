@@ -28,7 +28,7 @@ class TagService extends Service implements TagServiceInterface
      */
     public function search(array $request)
     {
-        $model = Tag::withCount('taggables')->whereHas('posts');
+        $model = Tag::withCount('taggables')->has('posts');
 
         if (Arr::get($request, 'search')) $model = $model->containing(Arr::get($request, 'search'));
 
