@@ -32,6 +32,7 @@ Route::middleware('auth.user')->group(function () {
 
             Route::post('share', [PostController::class, 'share'])->name('share');
         });
+        Route::post('{trashed_post}/restore', [PostController::class, 'restore'])->name('restore');
 
         Route::prefix('search')->name('search.')->group(function () {
             Route::post('/', [PostController::class, 'searchPosts'])->name('posts');
@@ -39,6 +40,7 @@ Route::middleware('auth.user')->group(function () {
             Route::post('shares', [PostController::class, 'searchShares'])->name('shares');
             Route::post('wall/{user}', [PostController::class, 'searchWall'])->name('wall');
             Route::post('{post}/matches', [PostController::class, 'searchMatches'])->name('matches');
+            Route::post('archives', [PostController::class, 'searchArchives'])->name('archives');
         });
     });
 

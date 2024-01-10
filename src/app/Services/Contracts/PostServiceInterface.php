@@ -78,4 +78,20 @@ interface PostServiceInterface extends Store, Show, Update, Destroy
      * @return \Illuminate\Http\Response
      */
     public function searchMatches(array $request, Post $post);
+
+    /**
+     * Search for specific resources in the database.
+     *
+     * @param  array  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function searchArchives(array $request);
+
+    /**
+     * Restore the specified resource in storage.
+     *
+     * @param  \App\Models\Post $post
+     * @return \Illuminate\Http\Response
+     */
+    public function restore(Post $post);
 }

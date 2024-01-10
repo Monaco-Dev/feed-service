@@ -64,4 +64,21 @@ trait Searchable
                 ->paginate()
         );
     }
+
+    /**
+     * Search for specific resources in the database.
+     *
+     * @param  array  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function searchArchives(array $request)
+    {
+        $search = Arr::get($request, 'search');
+
+        return $this->setResponseCollection(
+            $this->repository->model()
+                ->searchArchives($search)
+                ->paginate()
+        );
+    }
 }

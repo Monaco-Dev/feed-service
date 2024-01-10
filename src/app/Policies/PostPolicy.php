@@ -32,6 +32,18 @@ class PostPolicy
     }
 
     /**
+     * Determine whether the user can restore the model.
+     * 
+     * @param App\Models\User $user
+     * @param App\Models\Post $post
+     * @return bool
+     */
+    public function restore(User $user, Post $post): bool
+    {
+        return $user->id == $post->user_id;
+    }
+
+    /**
      * Determine whether the user can pin the model.
      * 
      * @param App\Models\User $user
@@ -88,6 +100,6 @@ class PostPolicy
      */
     public function searchMatches(User $user, Post $post): bool
     {
-        return $post->is_verified;
+        return $post->is_verified && $user->id === $post->user_id;
     }
 }

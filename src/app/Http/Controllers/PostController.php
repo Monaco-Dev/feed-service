@@ -8,6 +8,7 @@ use App\Http\Requests\Post\{
     UpdateRequest,
     DestroyRequest,
     PinRequest,
+    RestoreRequest,
     UnpinRequest,
     ShareRequest,
 };
@@ -175,5 +176,28 @@ class PostController extends Controller
         $this->authorizeForUser(request()->user(), 'search-matches-post', $post);
 
         return $this->service->searchMatches($request->validated(), $post);
+    }
+
+    /**
+     * Search for specific resources in the database.
+     *
+     * @param  \App\Http\Requests\SearchRequest  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function searchArchives(SearchRequest $request)
+    {
+        return $this->service->searchArchives($request->validated());
+    }
+
+    /**
+     * Restore the specified resource in storage.
+     *
+     * @param  \App\Http\Requests\Post\RestoreRequest $request
+     * @param  \App\Models\Post $post
+     * @return \Illuminate\Http\Response
+     */
+    public function restore(RestoreRequest $request, Post $post)
+    {
+        return $this->service->restore($post);
     }
 }

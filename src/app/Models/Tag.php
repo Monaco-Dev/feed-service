@@ -22,4 +22,21 @@ class Tag extends TagModel
     {
         return $this->hasMany(Taggable::class);
     }
+
+    /**
+     * Return Post Relationship.
+     * 
+     * @return App\Models\Post
+     */
+    public function posts()
+    {
+        return $this->hasManyThrough(
+            Post::class,
+            Taggable::class,
+            'tag_id',
+            'id',
+            'id',
+            'taggable_id'
+        );
+    }
 }
