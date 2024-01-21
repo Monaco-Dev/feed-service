@@ -92,7 +92,13 @@ trait Scopes
             ->leftJoin("$authDb.follows as f1", 'f1.follow_user_id', 'posts.user_id');
 
         if ($search) {
-            $query = $query->whereRaw('lower(posts.content) like ?', ['%' . mb_strtolower($search) . '%']);
+            $keywords = explode(' ', $search);
+
+            $query = $query;
+
+            foreach ($keywords as $keyword) {
+                $query = $query->whereRaw('lower(posts.content) like ?', ['%' . mb_strtolower($keyword) . '%']);
+            }
         } else {
             $query = $query->where(function ($query) use ($userId) {
                 $query->where('posts.user_id', $userId)
