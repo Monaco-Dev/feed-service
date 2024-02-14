@@ -21,7 +21,7 @@ class UserResource extends JsonResource
             'id',
             'full_name',
             'slug',
-            'avatar',
+            'avatar_url',
             'is_verified'
         ];
 

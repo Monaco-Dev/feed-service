@@ -59,6 +59,7 @@ class User extends Authenticatable
         'is_following',
         'is_follower',
         'is_connection',
-        'is_verified'
+        'is_verified',
+        'avatar_url'
     ];
 }

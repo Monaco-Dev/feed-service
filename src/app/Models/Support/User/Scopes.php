@@ -4,6 +4,8 @@ namespace App\Models\Support\User;
 
 use Illuminate\Database\Eloquent\Builder;
 
+use App\Models\License;
+
 trait Scopes
 {
     /**
@@ -13,14 +15,14 @@ trait Scopes
      */
     public function scopeVerified(Builder $query): Builder
     {
-        // $brokerLicenseModel = (new BrokerLicense)->getConnectionName();
-        // $authDb = config("database.connections.$brokerLicenseModel.database");
+        $licenseModel = (new License())->getConnectionName();
+        $authDb = config("database.connections.$licenseModel.database");
 
         return $query->whereNotNull('email_verified_at')
             ->whereNull('deactivated_at')
-            ->whereNull('deleted_at');
-        // ->whereHas('brokerLicense', function ($query) use ($authDb) {
-        //     $query->from("$authDb.broker_licenses")->verified();
-        // });
+            ->whereNull('users.deleted_at')
+            ->whereHas('license', function ($query) use ($authDb) {
+                $query->from("$authDb.licenses")->verified();
+            });
     }
 }
