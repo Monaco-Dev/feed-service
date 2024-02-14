@@ -5,13 +5,16 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-use App\Models\Support\BrokerLicense\Attributes;
-use App\Models\Support\BrokerLicense\Relationships;
-use App\Models\Support\BrokerLicense\Scopes;
+use App\Models\Support\License\Attributes;
+use App\Models\Support\License\Relationships;
+use App\Models\Support\License\Scopes;
 
-class BrokerLicense extends Model
+class License extends Model
 {
-    use HasFactory, Attributes, Relationships, Scopes;
+    use HasFactory,
+        Attributes,
+        Scopes,
+        Relationships;
 
     /**
      * The connection name for the model.

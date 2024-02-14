@@ -2,20 +2,20 @@
 
 namespace App\Models\Support\User;
 
-use App\Models\BrokerLicense;
+use App\Models\License;
 use App\Models\Post;
 use App\Models\User;
 
 trait Relationships
 {
     /**
-     * Return BrokerLicense relationship.
+     * Return License relationship.
      * 
-     * @return App\Models\BrokerLicense
+     * @return App\Models\License
      */
-    public function brokerLicense()
+    public function license()
     {
-        return $this->setConnection('auth_mysql')->hasOne(BrokerLicense::class);
+        return $this->setConnection('auth_mysql')->hasOne(License::class);
     }
 
     /**

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models\Support\BrokerLicense;
+namespace App\Models\Support\License;
 
 use App\Models\User;
 
@@ -13,6 +13,6 @@ trait Relationships
      */
     public function user()
     {
-        return $this->setConnection('auth_mysql')->belongsTo(User::class);
+        return $this->belongsTo(User::class);
     }
 }
