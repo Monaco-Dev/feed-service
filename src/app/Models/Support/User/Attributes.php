@@ -157,7 +157,7 @@ trait Attributes
                 return Storage::disk('gcs')->url($this->avatar);
             }
         } else {
-            return fake()->imageUrl(540, 540, null, false, $this->first_name[0] . $this->last_name[0], true);
+            return null;
         }
     }
 }
