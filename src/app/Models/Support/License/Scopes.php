@@ -14,6 +14,7 @@ trait Scopes
     public function scopeVerified(Builder $query): Builder
     {
         return $query->whereNotNull('verified_at')
+            ->whereNull('deleted_at')
             ->where('expiration_date', '>', now());
     }
 }

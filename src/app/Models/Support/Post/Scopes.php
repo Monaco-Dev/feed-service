@@ -59,7 +59,7 @@ trait Scopes
                         and tb_l1.type is not null
                         and tb_l1.verified_at is not null
                         and tb_l1.expiration_date > NOW()
-                        and tb_l1.deleted_at is not null
+                        and tb_l1.deleted_at is null
                     )
                 ) as matches_count
             ");
