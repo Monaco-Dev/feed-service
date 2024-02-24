@@ -57,10 +57,11 @@ trait Searchable
     public function searchMatches(array $request, Post $post)
     {
         $search = Arr::get($request, 'search');
+        $onlyPins = Arr::get($request, 'only_pins');
 
         return $this->setResponseCollection(
             $this->repository->model()
-                ->searchMatches($post, $search)
+                ->searchMatches($post, $search, $onlyPins)
                 ->paginate()
         );
     }

@@ -17,6 +17,10 @@ class SearchRequest extends FormRequest
             'search' => [
                 'nullable',
                 'string'
+            ],
+            'only_pins' => [
+                'nullable',
+                'boolean'
             ]
         ];
     }

@@ -72,6 +72,8 @@ class PostService extends Service implements PostServiceInterface
 
         $post->syncTags(Arr::get($request, 'tags'));
 
+        $post = $this->repository->view($post->uuid);
+
         return new PostResource($post);
     }
 
@@ -91,6 +93,8 @@ class PostService extends Service implements PostServiceInterface
         $model->syncTags(Arr::get($request, 'tags'));
 
         Tag::doesntHave('taggables')->delete();
+
+        $model = $this->repository->view($model->uuid);
 
         return new PostResource($model);
     }
