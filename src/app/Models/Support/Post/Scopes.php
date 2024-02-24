@@ -141,7 +141,7 @@ trait Scopes
      * @param string|null $search
      * @return Illuminate\Database\Eloquent\Builder
      */
-    public function scopeSearchMatches(Builder $query, $post, $search = null): Builder
+    public function scopeSearchMatches(Builder $query, $post, $search = null, $onlyPins = false): Builder
     {
         $tags = $post->tags;
         $tagNames = $tags->pluck('name')->all();
@@ -152,13 +152,13 @@ trait Scopes
         $userModel = (new User)->getConnectionName();
         $authDb = config("database.connections.$userModel.database");
 
-        return $query->withCount([
+        $query = $query->withCount([
             'tags as match_tags_count' => function ($query) use ($tagIds) {
                 $query->whereIn('id', $tagIds);
             }
         ])
             ->withAnyTags($tagNames)
-            ->where('posts.user_id', '!=', optional(request()->user())->id)
+            ->where('posts.user_id', '!=', $userId)
             ->where('posts.content', 'LIKE', "%$search%")
             ->whereRaw("
                 (
@@ -182,8 +182,15 @@ trait Scopes
                             )
                         )
                     )
-            ")
-            ->verified()
+            ");
+
+        if ($onlyPins) {
+            $query = $query->whereHas('pins', function ($query) use ($userId) {
+                $query->whereUserId($userId);
+            });
+        }
+
+        $query = $query->verified()
             ->groupBy(['posts.id'])
             ->orderBy('match_tags_count', 'desc')
             ->orderBy(function ($query) use ($authDb, $userId) {
@@ -199,6 +206,8 @@ trait Scopes
                     ->select('posts.updated_at');
             }, 'desc')
             ->orderBy('posts.updated_at', 'desc');
+
+        return $query;
     }
 
     /**
