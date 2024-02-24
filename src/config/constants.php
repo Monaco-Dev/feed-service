@@ -12,8 +12,10 @@ return [
         'types' => [
             'fs' => 'FS',
             'fl' => 'FL',
+            'fr' => 'FR',
             'wtb' => 'WTB',
             'wtl' => 'WTL',
+            'wtr' => 'WTR'
         ]
     ],
 

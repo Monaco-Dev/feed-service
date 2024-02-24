@@ -33,7 +33,15 @@ trait Scopes
                                     IF(
                                         posts.content->'$.type' = 'WTL',
                                         'FL',
-                                        null
+                                        IF(
+                                            posts.content->'$.type' = 'FR',
+                                            'WTR',
+                                            IF(
+                                                posts.content->'$.type' = 'WTR',
+                                                'FR',
+                                                null
+                                            )
+                                        )
                                     )
                                 )
                             )
@@ -177,7 +185,15 @@ trait Scopes
                                 IF(
                                     posts.content->'$.type' = 'WTL',
                                     'FL',
-                                    null
+                                    IF(
+                                        posts.content->'$.type' = 'FR',
+                                        'WTR',
+                                        IF(
+                                            posts.content->'$.type' = 'WTR',
+                                            'FR',
+                                            null
+                                        )
+                                    )
                                 )
                             )
                         )
