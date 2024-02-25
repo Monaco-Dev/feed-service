@@ -4,6 +4,7 @@ namespace App\Models\Support\Post;
 
 use Illuminate\Database\Eloquent\Builder;
 
+use App\Models\Tag;
 use App\Models\User;
 
 trait Scopes
@@ -51,7 +52,17 @@ trait Scopes
                         where tb1.taggable_id = p1.id
                         and tb1.tag_id in (
                             select tb2.tag_id from taggables as tb2
-                            where tb2.taggable_id = posts.id
+
+                            left join tags as tb3
+                            on tb3.id = tb2.tag_id
+
+                            left join taggables as tb4
+                            on tb4.taggable_id = posts.id
+
+                            left join tags as tb5
+                            on tb5.id = tb4.tag_id
+
+                            where tb3.slug->'$.en' = tb5.slug->'$.en'
                         )
                     )
                     and exists (
@@ -152,8 +163,27 @@ trait Scopes
     public function scopeSearchMatches(Builder $query, $post, $search = null, $onlyPins = false): Builder
     {
         $tags = $post->tags;
-        $tagNames = $tags->pluck('name')->all();
+
+        $tagValues = [
+            ...$tags->pluck('name')->all(),
+            ...$tags->pluck('slug')->all()
+        ];
+
+        $tags = Tag::where(function ($query) use ($tagValues) {
+            $query->containing($tagValues[0]);
+        });
+        foreach ($tagValues as $tag) {
+            $tags->orWhere(function ($query) use ($tag) {
+                $query->containing($tag);
+            });
+        }
+        $tags = $tags->get();
+
         $tagIds = $tags->pluck('id')->all();
+        $tagValues = [
+            ...$tags->pluck('name')->all(),
+            ...$tags->pluck('slug')->all()
+        ];
 
         $userId = optional(request()->user())->id;
 
@@ -165,7 +195,7 @@ trait Scopes
                 $query->whereIn('id', $tagIds);
             }
         ])
-            ->withAnyTags($tagNames)
+            ->withAnyTags($tagValues)
             ->where('posts.user_id', '!=', $userId)
             ->where('posts.content', 'LIKE', "%$search%")
             ->whereRaw("
