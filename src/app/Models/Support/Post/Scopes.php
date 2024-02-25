@@ -21,6 +21,7 @@ trait Scopes
                 (
                     select count(*) from posts as p1
                     where p1.user_id != posts.user_id
+                    and p1.deleted_at is null
                     and p1.content->'$.type' = 
                         IF(
                             posts.content->'$.type' = 'FS', 
