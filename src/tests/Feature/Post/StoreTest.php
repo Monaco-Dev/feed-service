@@ -23,7 +23,7 @@ class StoreTest extends TestCase
     {
         $this->withoutMiddleware([PersonalAccessTokenAuthorization::class]);
 
-        $user = User::factory()->create();
+        $user = User::factory()->hasLicense()->create();
         $post = Post::factory()->make();
 
         $payload = [
@@ -34,6 +34,6 @@ class StoreTest extends TestCase
         $this->actingAs($user)
             ->withHeaders(['Accept' => 'application/json'])
             ->post(route($this->route), $payload)
-            ->assertCreated();
+            ->assertOk();
     }
 }

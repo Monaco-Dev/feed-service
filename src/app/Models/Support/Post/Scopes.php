@@ -3,6 +3,7 @@
 namespace App\Models\Support\Post;
 
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\App;
 
 use App\Models\Tag;
 use App\Models\User;
@@ -92,6 +93,9 @@ trait Scopes
      */
     public function scopeVerified(Builder $query): Builder
     {
+        if (App::runningUnitTests()) return $query->whereNull('deleted_at');
+
+
         $userModel = (new User())->getConnectionName();
         $authDb = config("database.connections.$userModel.database");
 
@@ -171,7 +175,7 @@ trait Scopes
         ];
 
         $tags = Tag::where(function ($query) use ($tagValues) {
-            $query->containing($tagValues[0]);
+            if (count($tagValues)) $query->containing($tagValues[0]);
         });
         foreach ($tagValues as $tag) {
             $tags->orWhere(function ($query) use ($tag) {

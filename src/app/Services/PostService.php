@@ -74,7 +74,7 @@ class PostService extends Service implements PostServiceInterface
 
         $post = $this->repository->view($post->uuid);
 
-        return new PostResource($post);
+        return response()->json(new PostResource($post));
     }
 
     /**
@@ -96,7 +96,7 @@ class PostService extends Service implements PostServiceInterface
 
         $model = $this->repository->view($model->uuid);
 
-        return new PostResource($model);
+        return response()->json(new PostResource($model));
     }
 
     /**

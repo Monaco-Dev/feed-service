@@ -24,7 +24,7 @@ class ShowTest extends TestCase
     {
         $this->withoutMiddleware([PersonalAccessTokenAuthorization::class]);
 
-        $user = User::factory()->hasBrokerLicense()->create();
+        $user = User::factory()->hasLicense()->create();
 
         $this->actingAs($user)
             ->withHeaders(['Accept' => 'application/json'])
@@ -39,7 +39,7 @@ class ShowTest extends TestCase
     {
         $this->withoutMiddleware([PersonalAccessTokenAuthorization::class, MiddlewarePost::class]);
 
-        $user = User::factory()->hasBrokerLicense()->create();
+        $user = User::factory()->hasLicense()->create();
         $post = Post::factory()->create(['user_id' => $user->id]);
 
         $this->actingAs($user)
