@@ -22,7 +22,7 @@ class SearchTest extends TestCase
     {
         $this->withoutMiddleware([PersonalAccessTokenAuthorization::class]);
 
-        $user = User::factory()->hasBrokerLicense()->hasPosts()->create();
+        $user = User::factory()->hasLicense()->hasPosts()->create();
 
         $this->actingAs($user)
             ->withHeaders(['Accept' => 'application/json'])

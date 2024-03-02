@@ -28,7 +28,7 @@ trait Shareable
 
         request()->user()->shares()->attach($post);
 
-        return new PostResource($post);
+        return response()->json(new PostResource($post));
     }
 
     /**

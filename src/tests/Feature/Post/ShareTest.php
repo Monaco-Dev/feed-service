@@ -33,7 +33,7 @@ class ShareTest extends TestCase
         $this->withoutMiddleware([PersonalAccessTokenAuthorization::class]);
 
         $user = User::factory()->create();
-        $dummy = User::factory()->hasBrokerLicense()->hasPosts()->create();
+        $dummy = User::factory()->hasLicense()->hasPosts()->create();
 
         $this->actingAs($user)
             ->withHeaders(['Accept' => 'application/json'])
