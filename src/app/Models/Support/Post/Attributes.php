@@ -13,7 +13,13 @@ trait Attributes
      */
     public function getIsVerifiedAttribute()
     {
-        return !!$this->user->verified()->find($this->user_id);
+        return (
+            $this->user->email_verified_at &&
+            !$this->user->deactivated_at &&
+            !$this->user->deleted_at &&
+            $this->user->license->is_license_verified &&
+            !$this->user->license->is_license_expired
+        );
     }
 
     /**

@@ -24,7 +24,7 @@ Route::middleware('auth.user')->group(function () {
         Route::get('{uuid}', [PostController::class, 'show'])->middleware('post')->name('show');
 
         Route::prefix('{post}')->group(function () {
-            Route::put('/', [PostController::class, 'update'])->name('update');
+            Route::post('update', [PostController::class, 'update'])->name('update');
             Route::delete('/', [PostController::class, 'destroy'])->name('destroy');
 
             Route::post('pin', [PostController::class, 'pin'])->name('pin');

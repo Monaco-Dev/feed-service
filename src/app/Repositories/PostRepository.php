@@ -92,7 +92,7 @@ class PostRepository extends Repository implements PostRepositoryInterface
             ->whereHas('pins', function ($query) use ($userId) {
                 $query->where('user_id', $userId);
             })
-            ->paginate();
+            ->simplePaginate();
 
         return $data;
     }
@@ -153,7 +153,7 @@ class PostRepository extends Repository implements PostRepositoryInterface
             ->whereHas('shares', function ($query) use ($userId) {
                 $query->where('user_id', $userId);
             })
-            ->paginate();
+            ->simplePaginate();
 
         return $posts;
     }

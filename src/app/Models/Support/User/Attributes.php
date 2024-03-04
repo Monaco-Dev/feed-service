@@ -43,89 +43,15 @@ trait Attributes
      * 
      * @return bool
      */
-    public function getIsOutgoingInviteAttribute()
-    {
-        if (!optional(request()->user())->id) return false;
-
-        return $this->incomingInvites()
-            ->wherePivot(
-                'user_id',
-                request()->user()->id
-            )->exists();
-    }
-
-    /**
-     * Append new attribute.
-     * 
-     * @return bool
-     */
-    public function getIsIncomingInviteAttribute()
-    {
-        if (!optional(request()->user())->id) return false;
-
-        return $this->outgoingInvites()
-            ->wherePivot(
-                'connection_invitation_user_id',
-                request()->user()->id
-            )->exists();
-    }
-
-    /**
-     * Append new attribute.
-     * 
-     * @return bool
-     */
-    public function getIsFollowingAttribute()
-    {
-        if (!optional(request()->user())->id) return false;
-
-        return $this->followers()
-            ->wherePivot(
-                'user_id',
-                request()->user()->id
-            )->exists();
-    }
-
-    /**
-     * Append new attribute.
-     * 
-     * @return bool
-     */
-    public function getIsFollowerAttribute()
-    {
-        if (!optional(request()->user())->id) return false;
-
-        return $this->following()
-            ->wherePivot(
-                'follow_user_id',
-                request()->user()->id
-            )->exists();
-    }
-
-    /**
-     * Append new attribute.
-     * 
-     * @return bool
-     */
-    public function getIsConnectionAttribute()
-    {
-        if (!optional(request()->user())->id) return false;
-
-        return $this->connections()
-            ->wherePivot(
-                'connection_user_id',
-                request()->user()->id
-            )->exists();
-    }
-
-    /**
-     * Append new attribute.
-     * 
-     * @return bool
-     */
     public function getIsVerifiedAttribute()
     {
-        return !!$this->verified()->find($this->id);
+        return (
+            $this->email_verified_at &&
+            !$this->deactivated_at &&
+            !$this->deleted_at &&
+            $this->license->is_license_verified &&
+            !$this->license->is_license_expired
+        );
     }
 
     /**
