@@ -23,6 +23,13 @@ class StoreRequest extends FormRequest
                 'required',
                 'string',
                 Rule::in(config('constants.post.types'))
+            ],
+            'tags' => [
+                'nullable',
+                'array'
+            ],
+            'tags.*' => [
+                'string'
             ]
         ];
     }

@@ -49,6 +49,7 @@ class PostResource extends JsonResource
 
         Arr::set($data, 'user', new UserResource($this->whenLoaded('user')));
         Arr::set($data, 'shared_post', new PostResource($this->whenLoaded('sharedPost')));
+        Arr::set($data, 'tags', TagResource::collection($this->whenLoaded('tags')));
 
         return $data;
     }
