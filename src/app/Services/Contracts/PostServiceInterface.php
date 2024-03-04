@@ -57,14 +57,6 @@ interface PostServiceInterface extends Store, Show, Update, Destroy
      * Search for specific resources in the database.
      *
      * @param  array  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function searchShares(array $request);
-
-    /**
-     * Search for specific resources in the database.
-     *
-     * @param  array  $request
      * @param  \App\Models\User $user
      * @return \Illuminate\Http\Response
      */

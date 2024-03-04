@@ -12,20 +12,6 @@ use App\Repositories\Support\BaseContracts\{
 interface PostRepositoryInterface extends Find, Create, Update, Delete
 {
     /**
-     * Get paginated pin posts
-     * 
-     * @return \Illuminate\Database\Eloquent\Model
-     */
-    public function pins();
-
-    /**
-     * Get paginated shared posts
-     * 
-     * @return \Illuminate\Database\Eloquent\Model
-     */
-    public function shares();
-
-    /**
      * Display the specified resource.
      *
      * @param string $uuid

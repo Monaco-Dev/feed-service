@@ -26,20 +26,29 @@ class PostResource extends JsonResource
             'updated_at',
             'deleted_at',
             'pinned_at',
-            'shares_count',
             'is_shared',
             'is_edited'
         ];
 
-        if (Arr::get($data, 'user_id') == optional(request()->user())->id) {
+        if (
+            Arr::get($data, 'user_id') == optional(request()->user())->id &&
+            !Arr::get($data, 'is_shared')
+        ) {
             $fields = array_merge($fields, [
                 'matches_count'
+            ]);
+        }
+
+        if (!Arr::get($data, 'is_shared')) {
+            $fields = array_merge($fields, [
+                'shares_count'
             ]);
         }
 
         $data = Arr::only($data, $fields);
 
         Arr::set($data, 'user', new UserResource($this->whenLoaded('user')));
+        Arr::set($data, 'shared_post', new PostResource($this->whenLoaded('sharedPost')));
 
         return $data;
     }

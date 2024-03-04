@@ -42,7 +42,8 @@ class Post extends Model
      * @var array<string>
      */
     protected $with = [
-        'user'
+        'user',
+        'sharedPost'
     ];
 
     /**
@@ -63,7 +64,6 @@ class Post extends Model
      */
     protected $appends = [
         'is_verified',
-        'pinned_at',
         'is_shared',
         'is_edited'
     ];
