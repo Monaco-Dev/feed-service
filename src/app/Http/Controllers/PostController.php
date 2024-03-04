@@ -143,17 +143,6 @@ class PostController extends Controller
      * Search for specific resources in the database.
      *
      * @param  \App\Http\Requests\SearchRequest  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function searchShares(SearchRequest $request)
-    {
-        return $this->service->searchShares($request->validated());
-    }
-
-    /**
-     * Search for specific resources in the database.
-     *
-     * @param  \App\Http\Requests\SearchRequest  $request
      * @param  \App\Models\User $user
      * @return \Illuminate\Http\Response
      */

@@ -4,6 +4,7 @@ namespace App\Models\Support\Post;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\DB;
 
 use App\Models\Tag;
 use App\Models\User;
@@ -17,71 +18,76 @@ trait Scopes
      */
     public function scopeWithMatchesCount(Builder $query): Builder
     {
+        $userId = optional(request()->user())->id;
+
         return $query
             ->selectRaw("
-                (
-                    select count(*) from posts as p1
-                    where p1.user_id != posts.user_id
-                    and p1.deleted_at is null
-                    and p1.content->'$.type' =
-                        IF(
-                            posts.content->'$.type' = 'FS',
-                            'WTB',
+                IF(posts.user_id = $userId,
+                    (
+                        select count(*) from posts as p1
+                        where p1.user_id != posts.user_id
+                        and p1.deleted_at is null
+                        and p1.content->'$.type' =
                             IF(
-                                posts.content->'$.type' = 'WTB',
-                                'FS',
+                                posts.content->'$.type' = 'FS',
+                                'WTB',
                                 IF(
-                                    posts.content->'$.type' = 'FL',
-                                    'WTL',
+                                    posts.content->'$.type' = 'WTB',
+                                    'FS',
                                     IF(
-                                        posts.content->'$.type' = 'WTL',
-                                        'FL',
+                                        posts.content->'$.type' = 'FL',
+                                        'WTL',
                                         IF(
-                                            posts.content->'$.type' = 'FR',
-                                            'WTR',
+                                            posts.content->'$.type' = 'WTL',
+                                            'FL',
                                             IF(
-                                                posts.content->'$.type' = 'WTR',
-                                                'FR',
-                                                null
+                                                posts.content->'$.type' = 'FR',
+                                                'WTR',
+                                                IF(
+                                                    posts.content->'$.type' = 'WTR',
+                                                    'FR',
+                                                    null
+                                                )
                                             )
                                         )
                                     )
                                 )
                             )
+                        and exists (
+                            select * from taggables as tb1
+                            where tb1.taggable_id = p1.id
+                            and tb1.tag_id in (
+                                select tb2.tag_id from taggables as tb2
+
+                                left join tags as tb3
+                                on tb3.id = tb2.tag_id
+
+                                left join taggables as tb4
+                                on tb4.taggable_id = posts.id
+
+                                left join tags as tb5
+                                on tb5.id = tb4.tag_id
+
+                                where tb3.slug->'$.en' = tb5.slug->'$.en'
+                            )
                         )
-                    and exists (
-                        select * from taggables as tb1
-                        where tb1.taggable_id = p1.id
-                        and tb1.tag_id in (
-                            select tb2.tag_id from taggables as tb2
-
-                            left join tags as tb3
-                            on tb3.id = tb2.tag_id
-
-                            left join taggables as tb4
-                            on tb4.taggable_id = posts.id
-
-                            left join tags as tb5
-                            on tb5.id = tb4.tag_id
-
-                            where tb3.slug->'$.en' = tb5.slug->'$.en'
+                        and exists (
+                            select * from monaco_auth.users as tbu1
+                            where tbu1.id = p1.user_id
+                            and tbu1.email_verified_at is not null
+                            and tbu1.deactivated_at is null
+                            and tbu1.deleted_at is null
                         )
-                    )
-                    and exists (
-                        select * from monaco_auth.users as tbu1
-                        where tbu1.id = p1.user_id
-                        and tbu1.email_verified_at is not null
-                        and tbu1.deactivated_at is null
-                        and tbu1.deleted_at is null
-                    )
-                    and exists (
-                        select * from monaco_auth.licenses as tb_l1
-                        where tb_l1.user_id = p1.user_id
-                        and tb_l1.type is not null
-                        and tb_l1.verified_at is not null
-                        and tb_l1.expiration_date > NOW()
-                        and tb_l1.deleted_at is null
-                    )
+                        and exists (
+                            select * from monaco_auth.licenses as tb_l1
+                            where tb_l1.user_id = p1.user_id
+                            and tb_l1.type is not null
+                            and tb_l1.verified_at is not null
+                            and tb_l1.expiration_date > NOW()
+                            and tb_l1.deleted_at is null
+                        )
+                    ),
+                    0
                 ) as matches_count
             ");
     }
@@ -120,8 +126,13 @@ trait Scopes
         $authDb = config("database.connections.$userModel.database");
 
         $query = $query->withMatchesCount()
+            ->selectRaw('pins.created_at as pinned_at')
             ->leftJoin("$authDb.connections as c1", 'c1.connection_user_id', 'posts.user_id')
-            ->leftJoin("$authDb.follows as f1", 'f1.follow_user_id', 'posts.user_id');
+            ->leftJoin("$authDb.follows as f1", 'f1.follow_user_id', 'posts.user_id')
+            ->leftJoin('pins', function ($join) use ($userId) {
+                $join->on('pins.user_id', DB::raw("'$userId'"))
+                    ->on('pins.post_id', 'posts.id');
+            });
 
         if ($search) {
             $keywords = explode(' ', $search);
@@ -140,7 +151,7 @@ trait Scopes
         }
 
         return $query->verified()
-            ->groupBy(['posts.id'])
+            ->groupBy(['posts.id', 'pinned_at'])
             ->orderBy('posts.updated_at', 'desc')
             ->orderBy(function ($query) use ($authDb, $userId) {
                 return $query->from("$authDb.follows")
@@ -194,12 +205,17 @@ trait Scopes
         $userModel = (new User)->getConnectionName();
         $authDb = config("database.connections.$userModel.database");
 
-        $query = $query->withCount([
-            'tags as match_tags_count' => function ($query) use ($tagIds) {
-                $query->whereIn('id', $tagIds);
-            }
-        ])
+        $query = $query->selectRaw('pins.created_at as pinned_at')
+            ->withCount([
+                'tags as match_tags_count' => function ($query) use ($tagIds) {
+                    $query->whereIn('id', $tagIds);
+                }
+            ])
             ->withAnyTags($tagValues)
+            ->leftJoin('pins', function ($join) use ($userId) {
+                $join->on('pins.user_id', DB::raw("'$userId'"))
+                    ->on('pins.post_id', 'posts.id');
+            })
             ->where('posts.user_id', '!=', $userId)
             ->where('posts.content', 'LIKE', "%$search%")
             ->whereRaw("
@@ -241,7 +257,7 @@ trait Scopes
         }
 
         $query = $query->verified()
-            ->groupBy(['posts.id'])
+            ->groupBy(['posts.id', 'pinned_at'])
             ->orderBy('match_tags_count', 'desc')
             ->orderBy(function ($query) use ($authDb, $userId) {
                 return $query->from("$authDb.connections")

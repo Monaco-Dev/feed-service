@@ -14,27 +14,12 @@ trait Attributes
     public function getIsVerifiedAttribute()
     {
         return (
-            $this->user->email_verified_at &&
-            !$this->user->deactivated_at &&
-            !$this->user->deleted_at &&
-            $this->user->license->is_license_verified &&
-            !$this->user->license->is_license_expired
+            optional($this->user)->email_verified_at &&
+            !optional($this->user)->deactivated_at &&
+            !optional($this->user)->deleted_at &&
+            optional(optional($this->user)->license)->is_license_verified &&
+            !optional(optional($this->user)->license)->is_license_expired
         );
-    }
-
-    /**
-     * Append new attribute.
-     * 
-     * @return bool
-     */
-    public function getPinnedAtAttribute()
-    {
-        return optional(
-            $this->pins()->where(
-                'user_id',
-                optional(request()->user())->id
-            )->first()
-        )->created_at;
     }
 
     /**
@@ -44,7 +29,7 @@ trait Attributes
      */
     public function getIsSharedAttribute()
     {
-        return Arr::has($this->content, 'id');
+        return Arr::has($this->content, 'post_id');
     }
 
     /**
