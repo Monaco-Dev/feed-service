@@ -45,9 +45,9 @@ class PostService extends Service implements PostServiceInterface
     {
         $content = Arr::get($request, 'content');
         $type = Arr::get($request, 'type');
-        preg_match_all('/#([\w]+)/', $content, $tags);
+        $tags = Arr::get($request, 'tags') ?? [];
 
-        Arr::set($request, 'tags', $tags[1]);
+        Arr::set($request, 'tags', $tags);
         Arr::set($request, 'user_id', optional(request()->user())->id);
         Arr::set($request, 'content', [
             'body' => $content,

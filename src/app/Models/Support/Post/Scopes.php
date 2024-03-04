@@ -139,9 +139,17 @@ trait Scopes
 
             $query = $query;
 
+            $tags = [];
+
             foreach ($keywords as $keyword) {
-                $query = $query->whereRaw('lower(posts.content) like ?', ['%' . mb_strtolower($keyword) . '%']);
+                if ($keyword[0] !== '#') {
+                    $query = $query->whereRaw('lower(posts.content) like ?', ['%' . mb_strtolower($keyword) . '%']);
+                } else {
+                    $tags[] = str_replace('#', '', $keyword);
+                }
             }
+
+            if ($tags) $query = $query->withAnyTags($tags);
         } else {
             $query = $query->where(function ($query) use ($userId) {
                 $query->where('posts.user_id', $userId)

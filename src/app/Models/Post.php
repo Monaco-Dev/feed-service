@@ -43,7 +43,8 @@ class Post extends Model
      */
     protected $with = [
         'user',
-        'sharedPost'
+        'sharedPost',
+        'tags'
     ];
 
     /**
