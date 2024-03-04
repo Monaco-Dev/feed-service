@@ -23,10 +23,10 @@ trait Scopes
                     select count(*) from posts as p1
                     where p1.user_id != posts.user_id
                     and p1.deleted_at is null
-                    and p1.content->'$.type' = 
+                    and p1.content->'$.type' =
                         IF(
-                            posts.content->'$.type' = 'FS', 
-                            'WTB', 
+                            posts.content->'$.type' = 'FS',
+                            'WTB',
                             IF(
                                 posts.content->'$.type' = 'WTB',
                                 'FS',
@@ -139,8 +139,7 @@ trait Scopes
             });
         }
 
-        return $query
-            ->verified()
+        return $query->verified()
             ->groupBy(['posts.id'])
             ->orderBy('posts.updated_at', 'desc')
             ->orderBy(function ($query) use ($authDb, $userId) {

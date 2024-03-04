@@ -48,7 +48,7 @@ trait Shareable
                 ->withMatchesCount()
                 ->where('content', 'LIKE', "%$search%")
                 ->orderBy('shares.created_at', 'desc')
-                ->paginate()
+                ->simplePaginate()
         );
     }
 }

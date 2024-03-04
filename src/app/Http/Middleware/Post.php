@@ -17,7 +17,7 @@ class Post
      */
     public function handle(Request $request, Closure $next): Response
     {
-        $model = PostRepository::view($request->route('uuid'));
+        $model = PostRepository::model()->verified()->whereUuid($request->route('uuid'))->exists();
 
         if (!$model) abort(404, 'Page not found');
 

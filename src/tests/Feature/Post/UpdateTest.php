@@ -22,7 +22,7 @@ class UpdateTest extends TestCase
     public function test_not_found(): void
     {
         $this->withHeaders(['Accept' => 'application/json'])
-            ->put(route($this->route, 1))
+            ->post(route($this->route, 1))
             ->assertNotFound();
     }
 
@@ -43,7 +43,7 @@ class UpdateTest extends TestCase
 
         $this->actingAs($user)
             ->withHeaders(['Accept' => 'application/json'])
-            ->put(route($this->route, $post), $payload)
+            ->post(route($this->route, $post), $payload)
             ->assertOk();
     }
 
@@ -59,7 +59,7 @@ class UpdateTest extends TestCase
 
         $this->actingAs($user)
             ->withHeaders(['Accept' => 'application/json'])
-            ->put(route($this->route, $post))
+            ->post(route($this->route, $post))
             ->assertForbidden();
     }
 }

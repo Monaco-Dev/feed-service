@@ -27,16 +27,6 @@ class UserResource extends JsonResource
             'is_verified'
         ];
 
-        if (Arr::get($data, 'id') != optional(request()->user())->id) {
-            $fields = array_merge($fields, [
-                'is_incoming_invite',
-                'is_outgoing_invite',
-                'is_following',
-                'is_follower',
-                'is_connection',
-            ]);
-        }
-
         $data = Arr::only($data, $fields);
 
         return $data;

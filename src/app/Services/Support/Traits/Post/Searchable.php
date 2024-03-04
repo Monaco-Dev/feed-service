@@ -23,7 +23,7 @@ trait Searchable
             $this->repository
                 ->model()
                 ->search($search)
-                ->paginate()
+                ->simplePaginate()
         );
     }
 
@@ -43,7 +43,7 @@ trait Searchable
                 ->withMatchesCount()
                 ->where('content', 'LIKE', "%$search%")
                 ->orderBy('posts.created_at', 'desc')
-                ->paginate()
+                ->simplePaginate()
         );
     }
 
@@ -62,7 +62,7 @@ trait Searchable
         return $this->setResponseCollection(
             $this->repository->model()
                 ->searchMatches($post, $search, $onlyPins)
-                ->paginate()
+                ->simplePaginate()
         );
     }
 
@@ -79,7 +79,7 @@ trait Searchable
         return $this->setResponseCollection(
             $this->repository->model()
                 ->searchArchives($search)
-                ->paginate()
+                ->simplePaginate()
         );
     }
 }

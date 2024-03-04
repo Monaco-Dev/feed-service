@@ -52,7 +52,7 @@ trait Pinnable
                 ->withMatchesCount()
                 ->where('content', 'LIKE', "%$search%")
                 ->orderBy('pins.created_at', 'desc')
-                ->paginate()
+                ->simplePaginate()
         );
     }
 }
