@@ -49,11 +49,11 @@ RUN chmod +rwx /var/www
 RUN chmod -R 777 /var/www
 
 # setup FE
-RUN npm install
+# RUN npm install
 
-RUN npm rebuild node-sass
+# RUN npm rebuild node-sass
 
-RUN npm run prod
+# RUN npm run prod
 
 # setup composer and laravel
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
