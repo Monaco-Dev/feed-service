@@ -21,7 +21,7 @@ FROM node:18 as build
 
 WORKDIR /app
 
-COPY ./app/package*.json ./
+COPY ./package*.json ./
 
 RUN npm install
 
