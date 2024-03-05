@@ -15,9 +15,9 @@ RUN cd /app && \
     /usr/local/bin/composer install --optimize-autoloader --no-dev &&  \
     docker-php-ext-install pdo pdo_mysql
 
+FROM node:18
+RUN cd /app && npm install
+
 RUN chown -R www-data: /app
 
 CMD sh /app/docker/startup.sh
-
-FROM node:18
-RUN cd /app && npm install
