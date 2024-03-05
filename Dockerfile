@@ -17,7 +17,7 @@ RUN cd /app && \
     php artisan route:cache && \
     docker-php-ext-install pdo pdo_mysql
 
-FROM node:18
+FROM node:18 as build
 RUN cd /app && \ 
     npm install && \
     npm run build
