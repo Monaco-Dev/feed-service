@@ -12,7 +12,7 @@ COPY ./src /app
 
 RUN sh -c "wget http://getcomposer.org/composer.phar && chmod a+x composer.phar && mv composer.phar /usr/local/bin/composer"
 RUN cd /app && \
-    /usr/local/bin/composer install --optimize-autoloader --no-dev &&  \
+    /usr/local/bin/composer install --optimize-autoloader &&  \
     php artisan config:cache && \
     php artisan route:cache && \
     docker-php-ext-install pdo pdo_mysql
