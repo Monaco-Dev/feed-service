@@ -6,8 +6,6 @@ RUN mkdir -p /run/nginx
 
 COPY docker/nginx.conf /etc/nginx/nginx.conf
 
-FROM node:18
-
 RUN mkdir -p /app
 COPY . /app
 COPY ./src /app
@@ -20,3 +18,6 @@ RUN cd /app && \
 RUN chown -R www-data: /app
 
 CMD sh /app/docker/startup.sh
+
+FROM node:18
+RUN npm install
