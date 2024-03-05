@@ -6,17 +6,16 @@ RUN mkdir -p /run/nginx
 
 COPY docker/nginx.conf /etc/nginx/nginx.conf
 
+FROM node:18
+
 RUN mkdir -p /app
 COPY . /app
 COPY ./src /app
 
-# FROM node:18
-# COPY ./src/package*.json /app
-
 RUN sh -c "wget http://getcomposer.org/composer.phar && chmod a+x composer.phar && mv composer.phar /usr/local/bin/composer"
 RUN cd /app && \
     /usr/local/bin/composer install --optimize-autoloader --no-dev &&  \
-    docker-php-ext-install pdo pdo_mysql
+    docker-php-ext-install pdo pdo_mysql && npm install
 
 RUN chown -R www-data: /app
 
