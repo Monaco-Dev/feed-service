@@ -14,6 +14,7 @@ RUN sh -c "wget http://getcomposer.org/composer.phar && chmod a+x composer.phar 
 RUN cd /app && \
     /usr/local/bin/composer install --optimize-autoloader --no-dev &&  \
     php artisan config:cache && \
+    php artisan route:cache && \
     docker-php-ext-install pdo pdo_mysql
 
 RUN chown -R www-data: /app
