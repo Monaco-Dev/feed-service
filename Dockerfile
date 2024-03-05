@@ -1,4 +1,5 @@
 FROM php:8.2-fpm-alpine
+FROM node:18
 
 RUN apk add --no-cache nginx wget
 
@@ -15,14 +16,10 @@ RUN cd /app && \
     /usr/local/bin/composer install --optimize-autoloader --no-dev &&  \
     php artisan config:cache && \
     php artisan route:cache && \
-    docker-php-ext-install pdo pdo_mysql
+    docker-php-ext-install pdo pdo_mysql && \
+    npm install && \
+    npm run build
 
 RUN chown -R www-data: /app
 
 CMD sh /app/docker/startup.sh
-
-FROM node:18
-
-RUN npm install
-
-RUN npm run build
