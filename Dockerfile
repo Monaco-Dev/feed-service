@@ -11,7 +11,7 @@ COPY . /app
 COPY ./src /app
 
 FROM node:18
-COPY ./src/package*.json ./app
+COPY ./src/package*.json /app
 
 RUN sh -c "wget http://getcomposer.org/composer.phar && chmod a+x composer.phar && mv composer.phar /usr/local/bin/composer"
 RUN cd /app && \
