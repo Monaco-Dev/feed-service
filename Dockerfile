@@ -17,8 +17,8 @@ RUN cd /app && \
 
 RUN chown -R www-data: /app
 
-FROM node:18 as build
-RUN ls -la
+FROM node:18
+RUN cd ../ && ls -la
 # WORKDIR /app
 
 # COPY ./package*.json ./
