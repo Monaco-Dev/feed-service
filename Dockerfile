@@ -18,13 +18,13 @@ RUN cd /app && \
 RUN chown -R www-data: /app
 
 FROM node:18 as build
+RUN ls -la
+# WORKDIR /app
 
-WORKDIR /app
+# COPY ./package*.json ./
 
-COPY ./package*.json ./
+# RUN npm install
 
-RUN npm install
-
-COPY . .
+# COPY . .
 
 CMD sh /app/docker/startup.sh
