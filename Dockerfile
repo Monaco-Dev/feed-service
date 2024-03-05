@@ -1,6 +1,7 @@
 FROM php:8.2-fpm-alpine
 
 RUN apk add --no-cache nginx wget
+RUN apk add --update npm
 
 RUN mkdir -p /run/nginx
 
@@ -16,15 +17,5 @@ RUN cd /app && \
     docker-php-ext-install pdo pdo_mysql
 
 RUN chown -R www-data: /app
-
-# FROM node:18 as build
-RUN ls -la
-# WORKDIR /app
-
-# COPY ./package*.json ./
-
-# RUN npm install
-
-# COPY . .
 
 CMD sh /app/docker/startup.sh
