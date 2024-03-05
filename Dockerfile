@@ -18,12 +18,12 @@ RUN cd /app && \
 RUN chown -R www-data: /app
 
 FROM node:18 as build
-
+RUN ls -la
 # WORKDIR /app
 
 # COPY ./package*.json ./
 
-RUN cd /usr/local/bin/ && npm install
+# RUN npm install
 
 # COPY . .
 
