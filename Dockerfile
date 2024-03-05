@@ -17,8 +17,7 @@ RUN cd /app && \
 
 RUN chown -R www-data: /app
 
-FROM node:18
-RUN cd ../ && ls -la
+RUN cd /etc && ls -la
 # WORKDIR /app
 
 # COPY ./package*.json ./
@@ -28,3 +27,5 @@ RUN cd ../ && ls -la
 # COPY . .
 
 CMD sh /app/docker/startup.sh
+
+FROM node:18
