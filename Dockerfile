@@ -12,7 +12,8 @@ COPY ./src /app
 
 RUN sh -c "wget http://getcomposer.org/composer.phar && chmod a+x composer.phar && mv composer.phar /usr/local/bin/composer"
 RUN cd /app && \
-    /usr/local/bin/composer install --no-dev &&  \
+    /usr/local/bin/composer install --optimize-autoloader --no-dev &&  \
+    php artisan config:cache && \
     docker-php-ext-install pdo pdo_mysql
 
 RUN chown -R www-data: /app
