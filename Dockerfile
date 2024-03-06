@@ -1,6 +1,7 @@
 FROM php:8.2-fpm-alpine
 
 RUN apk add --no-cache nginx wget
+RUN apk add --update npm
 
 RUN mkdir -p /run/nginx
 
@@ -13,7 +14,9 @@ COPY ./src /app
 RUN sh -c "wget http://getcomposer.org/composer.phar && chmod a+x composer.phar && mv composer.phar /usr/local/bin/composer"
 RUN cd /app && \
     /usr/local/bin/composer install --optimize-autoloader --no-dev &&  \
-    docker-php-ext-install pdo pdo_mysql
+    docker-php-ext-install pdo pdo_mysql && \
+    npm install && \
+    npm run build
 
 RUN chown -R www-data: /app
 
