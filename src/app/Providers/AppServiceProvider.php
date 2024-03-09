@@ -4,12 +4,12 @@ namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\URL;
 
 use App\Services\Contracts\PostServiceInterface;
 use App\Services\Contracts\TagServiceInterface;
 use App\Services\PostService;
 use App\Services\TagService;
-use Illuminate\Support\Facades\URL;
 
 class AppServiceProvider extends ServiceProvider
 {
