@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\URL;
 
 use App\Services\Contracts\PostServiceInterface;
 use App\Services\Contracts\TagServiceInterface;
@@ -36,5 +37,9 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         JsonResource::withoutWrapping();
+
+        if (app()->environment('production')) {
+            URL::forceSchema('https');
+        }
     }
 }
