@@ -13,14 +13,16 @@ use App\Repositories\Contracts\PostRepositoryInterface;
 use App\Services\Support\Traits\Post\Pinnable;
 use App\Services\Support\Traits\Post\Searchable;
 use App\Services\Support\Traits\Post\Shareable;
+use App\Services\Support\Traits\Post\Hideable;
+use Illuminate\Support\Facades\DB;
 
 class PostService extends Service implements PostServiceInterface
 {
-    use Searchable, Shareable, Pinnable;
+    use Searchable, Shareable, Pinnable, Hideable;
 
     /**
      * Resource class of the service.
-     * 
+     *
      * @var \App\Http\Resources\PostResource
      */
     protected $resourceClass = PostResource::class;
@@ -37,22 +39,29 @@ class PostService extends Service implements PostServiceInterface
 
     /**
      * Prepare form request data.
-     * 
+     *
      * @param array $request
      * @return array
      */
     private function mapRequest(array $request)
     {
-        $content = Arr::get($request, 'content');
-        $type = Arr::get($request, 'type');
-        $tags = Arr::get($request, 'tags') ?? [];
+        if (Arr::has($request, 'content') && Arr::has($request, 'type')) {
+            $content = Arr::get($request, 'content');
+            $type = Arr::get($request, 'type');
 
-        Arr::set($request, 'tags', $tags);
+            Arr::set($request, 'content', [
+                'body' => $content,
+                'type' => $type
+            ]);
+        }
+
+        if (Arr::has($request, 'tags')) {
+            $tags = Arr::get($request, 'tags') ?? [];
+
+            Arr::set($request, 'tags', $tags);
+        }
+
         Arr::set($request, 'user_id', optional(request()->user())->id);
-        Arr::set($request, 'content', [
-            'body' => $content,
-            'type' => $type
-        ]);
 
         return $request;
     }
@@ -86,17 +95,30 @@ class PostService extends Service implements PostServiceInterface
      */
     public function update(mixed $model, array $request)
     {
-        $request = $this->mapRequest($request);
+        DB::beginTransaction();
 
-        $this->repository->update($model, Arr::except($request, ['tags']));
+        try {
+            $request = $this->mapRequest($request);
 
-        $model->syncTags(Arr::get($request, 'tags'));
+            $this->repository->update($model, Arr::except($request, ['tags']));
 
-        Tag::doesntHave('taggables')->delete();
+            if (Arr::has($request, 'tags')) {
+                $model->syncTags(Arr::get($request, 'tags'));
 
-        $model = $this->repository->view($model->uuid);
+                Tag::doesntHave('taggables')->delete();
+            }
 
-        return response()->json(new PostResource($model));
+            $model = $this->repository->view($model->uuid);
+
+            $response = new PostResource($model);
+
+            DB::commit();
+
+            return response()->json($response);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            throw $e;
+        }
     }
 
     /**

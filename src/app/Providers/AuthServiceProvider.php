@@ -33,5 +33,7 @@ class AuthServiceProvider extends ServiceProvider
         Gate::define('share-post', [PostPolicy::class, 'share']);
         Gate::define('search-wall-post', [PostPolicy::class, 'searchWall']);
         Gate::define('search-matches-post', [PostPolicy::class, 'searchMatches']);
+        Gate::define('hide-post', [PostPolicy::class, 'hide']);
+        Gate::define('unhide-post', [PostPolicy::class, 'unhide']);
     }
 }

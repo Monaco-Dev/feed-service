@@ -10,7 +10,7 @@ trait Relationships
 {
     /**
      * Return License relationship.
-     * 
+     *
      * @return App\Models\License
      */
     public function license()
@@ -20,7 +20,7 @@ trait Relationships
 
     /**
      * Return Post relationship.
-     * 
+     *
      * @return App\Models\Post
      */
     public function posts()
@@ -30,7 +30,7 @@ trait Relationships
 
     /**
      * Return Share relationship.
-     * 
+     *
      * @return App\Models\Share
      */
     public function shares()
@@ -42,7 +42,7 @@ trait Relationships
 
     /**
      * Return Pin relationship.
-     * 
+     *
      * @return App\Models\Pin
      */
     public function pins()
@@ -54,7 +54,7 @@ trait Relationships
 
     /**
      * Return Connections relationship.
-     * 
+     *
      * @return App\Models\Connection
      */
     public function connections()
@@ -71,7 +71,7 @@ trait Relationships
 
     /**
      * Return Connection Invitations relationship.
-     * 
+     *
      * @return App\Models\ConnectionInvitation
      */
     public function outgoingInvites()
@@ -88,7 +88,7 @@ trait Relationships
 
     /**
      * Return Connection Invitations relationship.
-     * 
+     *
      * @return App\Models\ConnectionInvitation
      */
     public function incomingInvites()
@@ -105,7 +105,7 @@ trait Relationships
 
     /**
      * Return Follow relationship.
-     * 
+     *
      * @return App\Models\Follow
      */
     public function following()
@@ -122,7 +122,7 @@ trait Relationships
 
     /**
      * Return Follow relationship.
-     * 
+     *
      * @return App\Models\Follow
      */
     public function followers()
@@ -134,6 +134,18 @@ trait Relationships
                 'follow_user_id',
                 'user_id',
             )
+            ->withTimestamps();
+    }
+
+    /**
+     * Return Hidden posts relationship.
+     *
+     * @return App\Models\Pin
+     */
+    public function hiddenPosts()
+    {
+        return $this->setConnection('mysql')
+            ->belongsToMany(Post::class, 'hidden_posts')
             ->withTimestamps();
     }
 }

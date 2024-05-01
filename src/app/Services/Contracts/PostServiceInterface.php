@@ -86,4 +86,20 @@ interface PostServiceInterface extends Store, Show, Update, Destroy
      * @return \Illuminate\Http\Response
      */
     public function restore(Post $post);
+
+    /**
+     * Hide the specified resource in storage.
+     *
+     * @param  \App\Models\Post $post
+     * @return \Illuminate\Http\Response
+     */
+    public function hide(Post $post);
+
+    /**
+     * Unhide the specified resource in storage.
+     *
+     * @param  \App\Models\Post $post
+     * @return \Illuminate\Http\Response
+     */
+    public function unhide(Post $post);
 }

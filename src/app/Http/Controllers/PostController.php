@@ -7,10 +7,12 @@ use App\Http\Requests\Post\{
     StoreRequest,
     UpdateRequest,
     DestroyRequest,
+    HideRequest,
     PinRequest,
     RestoreRequest,
     UnpinRequest,
     ShareRequest,
+    UnhideRequest,
 };
 use App\Http\Requests\SearchRequest;
 use App\Models\Post;
@@ -27,7 +29,7 @@ class PostController extends Controller
 
     /**
      * Create the controller instance and resolve its service.
-     * 
+     *
      * @param \App\Services\Contracts\PostServiceInterface $service
      */
     public function __construct(PostServiceInterface $service)
@@ -188,5 +190,29 @@ class PostController extends Controller
     public function restore(RestoreRequest $request, Post $post)
     {
         return $this->service->restore($post);
+    }
+
+    /**
+     * Hide the specified resource in storage.
+     *
+     * @param  \App\Http\Requests\Post\HideRequest $request
+     * @param  \App\Models\Post $post
+     * @return \Illuminate\Http\Response
+     */
+    public function hide(HideRequest $request, Post $post)
+    {
+        return $this->service->hide($post);
+    }
+
+    /**
+     * Unhide the specified resource in storage.
+     *
+     * @param  \App\Http\Requests\Post\UnhideRequest $request
+     * @param  \App\Models\Post $post
+     * @return \Illuminate\Http\Response
+     */
+    public function unhide(UnhideRequest $request, Post $post)
+    {
+        return $this->service->unhide($post);
     }
 }

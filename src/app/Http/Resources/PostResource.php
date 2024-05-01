@@ -26,8 +26,10 @@ class PostResource extends JsonResource
             'updated_at',
             'deleted_at',
             'pinned_at',
+            'hidden_at',
             'is_shared',
-            'is_edited'
+            'is_edited',
+            'is_sold',
         ];
 
         if (

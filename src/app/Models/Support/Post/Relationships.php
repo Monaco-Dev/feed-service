@@ -4,6 +4,7 @@ namespace App\Models\Support\Post;
 
 use Staudenmeir\EloquentJsonRelations\HasJsonRelationships;
 
+use App\Models\HiddenPost;
 use App\Models\Pin;
 use App\Models\Post;
 use App\Models\Share;
@@ -15,7 +16,7 @@ trait Relationships
 
     /**
      * Return Share relationship.
-     * 
+     *
      * @return App\Models\Share
      */
     public function shares()
@@ -25,7 +26,7 @@ trait Relationships
 
     /**
      * Return Pin relationship.
-     * 
+     *
      * @return App\Models\Pin
      */
     public function pins()
@@ -35,7 +36,7 @@ trait Relationships
 
     /**
      * Return User relationship.
-     * 
+     *
      * @return App\Models\User
      */
     public function user()
@@ -45,11 +46,21 @@ trait Relationships
 
     /**
      * Return Shared post relationship.
-     * 
+     *
      * @return App\Models\Post
      */
     public function sharedPost()
     {
         return $this->belongsTo(Post::class, 'content->post_id');
+    }
+
+    /**
+     * Return Hidden post relationship.
+     *
+     * @return App\Models\HiddenPost
+     */
+    public function hiddenPosts()
+    {
+        return $this->setConnection('mysql')->hasMany(HiddenPost::class);
     }
 }

@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('posts', function (Blueprint $table) {
-            $table->uuid()->after('id');
+            $table->enum('status', [0, 1])->after('content')->default(1)->comment('0: sold, 1: active');
         });
     }
 
@@ -22,7 +22,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('posts', function (Blueprint $table) {
-            $table->dropColumn('uuid');
+            $table->dropColumn('status');
         });
     }
 };

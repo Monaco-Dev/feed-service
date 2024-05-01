@@ -13,7 +13,7 @@ trait Scopes
 {
     /**
      * Append match count.
-     * 
+     *
      * @return Illuminate\Database\Eloquent\Builder
      */
     public function scopeWithMatchesCount(Builder $query): Builder
@@ -94,7 +94,7 @@ trait Scopes
 
     /**
      * User must be verified.
-     * 
+     *
      * @return Illuminate\Database\Eloquent\Builder
      */
     public function scopeVerified(Builder $query): Builder
@@ -113,7 +113,7 @@ trait Scopes
 
     /**
      * Wildcard search query
-     * 
+     *
      * @param Illuminate\Database\Eloquent\Builder $query
      * @param string|null $search
      * @return Illuminate\Database\Eloquent\Builder
@@ -132,6 +132,9 @@ trait Scopes
             ->leftJoin('pins', function ($join) use ($userId) {
                 $join->on('pins.user_id', DB::raw("'$userId'"))
                     ->on('pins.post_id', 'posts.id');
+            })
+            ->whereDoesntHave('hiddenPosts', function ($query) use ($userId) {
+                $query->whereUserId($userId);
             });
 
         if ($search) {
@@ -177,7 +180,7 @@ trait Scopes
 
     /**
      * Wildcard search query
-     * 
+     *
      * @param Illuminate\Database\Eloquent\Builder $query
      * @param App\Models\Post $post
      * @param string|null $search
@@ -213,7 +216,8 @@ trait Scopes
         $userModel = (new User)->getConnectionName();
         $authDb = config("database.connections.$userModel.database");
 
-        $query = $query->selectRaw('pins.created_at as pinned_at')
+        $query = $query
+            ->selectRaw('pins.created_at as pinned_at')
             ->withCount([
                 'tags as match_tags_count' => function ($query) use ($tagIds) {
                     $query->whereIn('id', $tagIds);
@@ -232,8 +236,8 @@ trait Scopes
                     where p1.id = $post->id
                 ) =
                     IF(
-                        posts.content->'$.type' = 'FS', 
-                        'WTB', 
+                        posts.content->'$.type' = 'FS',
+                        'WTB',
                         IF(
                             posts.content->'$.type' = 'WTB',
                             'FS',
@@ -256,7 +260,10 @@ trait Scopes
                             )
                         )
                     )
-            ");
+            ")
+            ->whereDoesntHave('hiddenPosts', function ($query) use ($userId) {
+                $query->whereUserId($userId);
+            });
 
         if ($onlyPins) {
             $query = $query->whereHas('pins', function ($query) use ($userId) {
@@ -286,7 +293,7 @@ trait Scopes
 
     /**
      * Wildcard search query
-     * 
+     *
      * @param Illuminate\Database\Eloquent\Builder $query
      * @param string|null $search
      * @return Illuminate\Database\Eloquent\Builder

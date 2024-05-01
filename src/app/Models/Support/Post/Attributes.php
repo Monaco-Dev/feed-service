@@ -8,7 +8,7 @@ trait Attributes
 {
     /**
      * Append new attribute.
-     * 
+     *
      * @return bool
      */
     public function getIsVerifiedAttribute()
@@ -24,7 +24,7 @@ trait Attributes
 
     /**
      * Append new attribute.
-     * 
+     *
      * @return bool
      */
     public function getIsSharedAttribute()
@@ -34,11 +34,31 @@ trait Attributes
 
     /**
      * Append new attribute.
-     * 
+     *
      * @return bool
      */
     public function getIsEditedAttribute()
     {
         return $this->created_at != $this->updated_at;
+    }
+
+    /**
+     * Append new attribute.
+     *
+     * @return bool
+     */
+    public function getIsSoldAttribute()
+    {
+        return $this->status === '0';
+    }
+
+    /**
+     * Append new attribute.
+     *
+     * @return string
+     */
+    public function getHiddenAtAttribute()
+    {
+        return optional(optional(request()->user())->hiddenPosts()->where('post_id', $this->id)->first())->created_at;
     }
 }

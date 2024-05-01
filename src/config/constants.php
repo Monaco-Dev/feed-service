@@ -16,6 +16,10 @@ return [
             'wtb' => 'WTB',
             'wtl' => 'WTL',
             'wtr' => 'WTR'
+        ],
+        'statuses' => [
+            0 => 'sold',
+            1 => 'active'
         ]
     ],
 

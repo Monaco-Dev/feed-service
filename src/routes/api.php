@@ -31,6 +31,9 @@ Route::middleware('auth.user')->group(function () {
             Route::post('unpin', [PostController::class, 'unpin'])->name('unpin');
 
             Route::post('share', [PostController::class, 'share'])->name('share');
+
+            Route::post('hide', [PostController::class, 'hide'])->name('hide');
+            Route::post('unhide', [PostController::class, 'unhide'])->name('unhide');
         });
         Route::post('{trashed_post}/restore', [PostController::class, 'restore'])->name('restore');
 

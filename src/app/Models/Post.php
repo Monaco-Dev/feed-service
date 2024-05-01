@@ -22,14 +22,14 @@ class Post extends Model
 
     /**
      * The connection name for the model.
-     * 
+     *
      * @var string
      */
     protected $connection = 'mysql';
 
     /**
      * The relationship counts that should be eager loaded on every query.
-     * 
+     *
      * @var array<string>
      */
     protected $withCount = [
@@ -38,7 +38,7 @@ class Post extends Model
 
     /**
      * The relations to eager load on every query.
-     * 
+     *
      * @var array<string>
      */
     protected $with = [
@@ -56,17 +56,20 @@ class Post extends Model
         'uuid',
         'user_id',
         'content',
+        'status'
     ];
 
     /**
      * The accessors to append to the model's array form.
-     * 
+     *
      * @var array<string>
      */
     protected $appends = [
         'is_verified',
         'is_shared',
-        'is_edited'
+        'is_edited',
+        'is_sold',
+        'hidden_at'
     ];
 
     /**

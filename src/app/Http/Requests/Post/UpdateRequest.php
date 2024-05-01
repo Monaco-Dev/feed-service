@@ -25,10 +25,12 @@ class UpdateRequest extends FormRequest
         return [
             'content' => [
                 'required',
+                'sometimes',
                 'string'
             ],
             'type' => [
                 'required',
+                'sometimes',
                 'string',
                 Rule::in(config('constants.post.types'))
             ],
@@ -38,6 +40,10 @@ class UpdateRequest extends FormRequest
             ],
             'tags.*' => [
                 'string'
+            ],
+            'status' => [
+                'numeric',
+                Rule::in(array_keys(config('constants.post.statuses')))
             ]
         ];
     }
